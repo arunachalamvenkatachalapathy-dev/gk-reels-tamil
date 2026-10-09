@@ -1,0 +1,16 @@
+name: Publish GK Snippets Tamil
+
+# Repository Actions will also be disabled in Settings. This manual placeholder
+# only demonstrates a non-publishing no-op and cannot upload or schedule posts.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paused:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm publishing is paused
+        run: echo "Publishing is disabled. Tamil question bank is not ready."
