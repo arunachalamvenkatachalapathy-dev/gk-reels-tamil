@@ -1,0 +1,102 @@
+[
+  {
+    "exclude_ID": "p2796-e2",
+    "keep_ID": "p1414-e2",
+    "reason": "Same Second Five-Year Plan aim rapid industrialisation"
+  },
+  {
+    "exclude_ID": "p4863-e2",
+    "keep_ID": "p2358-e1",
+    "reason": "Same Article38 socialorder welfare provision"
+  },
+  {
+    "exclude_ID": "p4296-e1",
+    "keep_ID": "p1293-e2",
+    "reason": "Same three HDI dimensions despite differently arranged choices"
+  },
+  {
+    "exclude_ID": "p3434-e2",
+    "keep_ID": "p4175-e1",
+    "reason": "Same Mandamus meaning wecommand"
+  },
+  {
+    "exclude_ID": "p3617-e3",
+    "keep_ID": "p0737-e1",
+    "reason": "Same TheosophicalSocietyHQdestinationMadrasAdyar"
+  },
+  {
+    "exclude_ID": "p3014-e1",
+    "keep_ID": "p4280-e1",
+    "reason": "Same westflowriverNarmadaquestionchoices"
+  },
+  {
+    "exclude_ID": "p2767-e1",
+    "keep_ID": "p0751-e1",
+    "reason": "Same Parliamentpowertomodifystateboundaries"
+  },
+  {
+    "exclude_ID": "p3894-e1",
+    "keep_ID": "p3535-e2",
+    "reason": "Same12PresidentnominatedRajyaSabhaseats"
+  },
+  {
+    "exclude_ID": "p4464-e1",
+    "keep_ID": "p0886-e2",
+    "reason": "SameShivajicoronationfortRaigad"
+  },
+  {
+    "exclude_ID": "p4439-e1",
+    "keep_ID": "p3062-e2",
+    "reason": "SameShivaPaavaiKovaiaddresseeManikkavasagar"
+  },
+  {
+    "exclude_ID": "p2134-e1",
+    "keep_ID": "p4280-e1",
+    "reason": "SameNarmadaonlywestflowamong4riversnegativephrasing"
+  },
+  {
+    "exclude_ID": "p4545-e1",
+    "keep_ID": "p3602-e1",
+    "reason": "SameSamudraguptaAllahabadpillarinscriptiontarget"
+  },
+  {
+    "exclude_ID": "p1940-e1",
+    "keep_ID": "p1414-e2",
+    "reason": "Same Second Five-Year Plan priority/aim, industrialisation"
+  },
+  {
+    "exclude_ID": "p3761-e1",
+    "keep_ID": "p0705-e1",
+    "reason": "Same 42nd Amendment adding socialist to Preamble; comprehensive p0705 includes all three words"
+  },
+  {
+    "exclude_ID": "p4555-e1",
+    "keep_ID": "p0705-e1",
+    "reason": "Same 42nd Amendment adding secular to Preamble; comprehensive p0705 includes all three words"
+  },
+  {
+    "exclude_ID": "p4319-e1",
+    "keep_ID": "p1201-e1",
+    "reason": "Same leader/organiser of Khudai Khidmatgar movement"
+  },
+  {
+    "exclude_ID": "p3617-e1",
+    "keep_ID": "p4242-e1",
+    "reason": "Same person-journal association Dravida Nadu; parent adjudicated 2026-10-13 01:52:53 IST. Replace with edition-attributed p2789-e2."
+  },
+  {
+    "exclude_ID": "p1287-e1",
+    "keep_ID": "p1711-e1",
+    "reason": "Same pertussis disease-organism association reversed; source worker CDC adjudication relayed by parent 01:58:11 IST"
+  },
+  {
+    "exclude_ID": "p1537-e1",
+    "keep_ID": "p1293-e2",
+    "reason": "HDI indicator subset duplicates full-dimensions target; UNDP adjudication relayed by parent 01:58:11 IST"
+  },
+  {
+    "exclude_ID": "p4280-e1",
+    "keep_ID": "p3353-e2",
+    "reason": "Same Narmada west-flowing association, longest qualifier not independent target; parent adjudicated 2026-10-13 02:10:28 IST"
+  }
+]
