@@ -1,17 +1,19 @@
 {
   "question_count": 730,
   "release_final": false,
-  "source_pixel_review": true,
+  "source_pixel_review": "allretainedsource/pixelcheckedexceptp3646explicitlysource-basedrebuild",
   "semantic_dedup_review": true,
   "official_answer_key_claimed": false,
-  "claude_final_review": "bothfilesuploaded, finalauditquota-blocked until04:30IST",
+  "claude_final_review": "requestedreviewcompleted; first300bounded, remaining430singlefile; p4411-p5023lighterpassdisclosedandacceptedwithallflagssourceadjudicated",
   "gemini_final_review": "claimed bounded review coverage for all retained730, includingp3252pause-retryverdict2026-10-13T02:25IST; adviserclaimsnotreleaseauthority",
   "guide_drive_link": null,
   "publish_enabled": false,
   "checkpoint_current": true,
-  "checkpoint_note": "730 source/pixel-grounded editorial proposals. Not final release.",
-  "checkpoint_file": "data/bank_730_review_pending_v2.json",
-  "editorial_change_count": 1000,
+  "checkpoint_note": "730 source-adjudicated review rows; completed adviser review with disclosed lighter Claude tail. Release approval still pending.",
+  "checkpoint_file": "data/2-bank_730_review_pending_v3.json",
+  "editorial_change_count": 1208,
   "adviser_unreviewed_ids": [],
-  "gemini_review_url": "https://gemini.google.com/app/d94438d8d724ff03"
+  "gemini_review_url": "https://gemini.google.com/app/d94438d8d724ff03",
+  "claude_review_url": "https://claude.ai/chat/e35bd951-ff36-4051-9559-661b2ed12673",
+  "audit_bundle_file": "data/1-tamil_bank_adviser_review_checkpoint_v3.json"
 }
