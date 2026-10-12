@@ -1,0 +1,34 @@
+[
+  {
+    "path": "assets/fonts/3-QuizSans.ttf",
+    "url": "https://raw.githubusercontent.com/arunachalamvenkatachalapathy-dev/gk-reels-hindi/main/assets/fonts/3-QuizSans.ttf",
+    "status": 200,
+    "sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+    "identical": true,
+    "bytes": 512672
+  },
+  {
+    "path": "assets/fonts/5-QuizTamil.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstamil/NotoSansTamil%5Bwdth,wght%5D.ttf",
+    "status": 200,
+    "sha256": "aa3a9b321f4b0bb2c40203ffbde9af89713227866e0e13f76e5b9eeea727cf88",
+    "identical": true,
+    "bytes": 340668
+  },
+  {
+    "path": "assets/logo.jpg",
+    "url": "https://raw.githubusercontent.com/arunachalamvenkatachalapathy-dev/gk-reels-hindi/main/assets/logo.jpg",
+    "status": 200,
+    "sha256": "0d27a961004779db81aeca358ce2234fc0bff36421a75f26288fc5a2579fa30b",
+    "identical": true,
+    "bytes": 251441
+  },
+  {
+    "path": "assets/audio/slot1_one_answer_left.mp3",
+    "url": "https://raw.githubusercontent.com/arunachalamvenkatachalapathy-dev/gk-reels-hindi/main/assets/audio/slot1_one_answer_left.mp3",
+    "status": 200,
+    "sha256": "df832f97fd01a8b5df7a8c360f9be42a3733d7567274bc8757a5e4bf566b27be",
+    "identical": true,
+    "bytes": 2855512
+  }
+]
