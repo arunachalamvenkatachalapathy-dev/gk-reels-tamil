@@ -74,6 +74,9 @@ def main():
     parser.add_argument('--question-id', required=True)
     parser.add_argument('--video', default=str(ROOT / 'output/tamil-preview.mp4'))
     parser.add_argument('--metadata')
+    parser.add_argument('--speech-manifest', help='JSON with three approved Charon speech paths')
+    parser.add_argument('--review-cta', action='store_true')
+    parser.add_argument('--review-max-duration', type=float, default=15.5)
     parser.add_argument('--approval')
     parser.add_argument('--state', default=str(ROOT / 'output/publish-state.json'))
     args = parser.parse_args()
@@ -81,7 +84,14 @@ def main():
         q = checked_question(args.question_id)
         from render import render_video
         Path(args.video).parent.mkdir(parents=True, exist_ok=True)
-        render_video(q, '#f5b947', args.video, str(ROOT / 'output/render-temp'))
+        if not args.speech_manifest:
+            raise ValueError('Approved Charon speech manifest required')
+        manifest = load(args.speech_manifest)
+        if manifest.get('voice') != 'Charon' or manifest.get('question_id') != args.question_id:
+            raise ValueError('Charon voice and exact question must match')
+        render_video(q, '#f5b947', args.video, str(ROOT / 'output/render-temp'),
+                     speech_paths=manifest['paths'], include_cta=args.review_cta,
+                     review_only=True, max_duration=args.review_max_duration)
         print('Review-only render complete. No upload.')
     else:
         if os.environ.get('PUBLISHING_ENABLED') != 'true':
