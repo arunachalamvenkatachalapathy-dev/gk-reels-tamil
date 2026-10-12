@@ -5,9 +5,14 @@
   "semantic_dedup_review": true,
   "official_answer_key_claimed": false,
   "claude_final_review": "bothfilesuploaded, finalauditquota-blocked until04:30IST",
-  "gemini_final_review": "initial retained IDs reviewed in bounded batches; last reservep3252review pending",
+  "gemini_final_review": "claims coverage of all retained original IDs and earlier reserves; p3252 adviser-unreviewed after server error and refusal",
   "guide_drive_link": null,
   "publish_enabled": false,
-  "checkpoint_current": false,
-  "checkpoint_note": "Committed bank awaits latest p4280 omission and p3252 reserve update. Do not use for release."
+  "checkpoint_current": true,
+  "checkpoint_note": "730 source/pixel-grounded editorial proposals. Not final release.",
+  "checkpoint_file": "data/bank_730_review_pending_v2.json",
+  "editorial_change_count": 1000,
+  "adviser_unreviewed_ids": [
+    "p3252-e2"
+  ]
 }
