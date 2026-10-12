@@ -1,0 +1,13 @@
+{
+  "question_count": 730,
+  "release_final": false,
+  "source_pixel_review": true,
+  "semantic_dedup_review": true,
+  "official_answer_key_claimed": false,
+  "claude_final_review": "bothfilesuploaded, finalauditquota-blocked until04:30IST",
+  "gemini_final_review": "initial retained IDs reviewed in bounded batches; last reservep3252review pending",
+  "guide_drive_link": null,
+  "publish_enabled": false,
+  "checkpoint_current": false,
+  "checkpoint_note": "Committed bank awaits latest p4280 omission and p3252 reserve update. Do not use for release."
+}
