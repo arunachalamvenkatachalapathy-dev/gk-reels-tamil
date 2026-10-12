@@ -28,6 +28,6 @@ def validate(rows, expected_count=None):
 
 if __name__ == '__main__':
     status = json.loads((ROOT / 'data/bank_release_status.json').read_text())
-    rows = json.loads((ROOT / 'data/bank_730_review_pending.json').read_text())
+    rows = json.loads((ROOT / status['checkpoint_file']).read_text())
     print('Structural check only:', validate(rows, status['question_count']), 'questions')
     print('Release final:', status['release_final'])
