@@ -1,16 +1,65 @@
-name: Publish GK Snippets Tamil
-
-# Repository Actions will also be disabled in Settings. This manual placeholder
-# only demonstrates a non-publishing no-op and cannot upload or schedule posts.
+name: Tamil GK reviewed render
 on:
   workflow_dispatch:
-
+    inputs:
+      question_id:
+        description: Source-reviewed Tamil question ID
+        required: true
+        type: string
+      speech_manifest:
+        description: Repository path to Charon speech manifest
+        required: true
+        type: string
+      review_cta:
+        description: Include review-only guide CTA
+        default: false
+        type: boolean
+      review_max_duration:
+        description: Review duration cap in seconds
+        default: '15.5'
+        type: string
 permissions:
   contents: read
-
+concurrency:
+  group: tamil-gk-reviewed-render
+  cancel-in-progress: false
 jobs:
-  paused:
+  review:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      QUESTION_ID: ${{ inputs.question_id }}
+      SPEECH_MANIFEST: ${{ inputs.speech_manifest }}
+      REVIEW_CTA: ${{ inputs.review_cta }}
+      MAX_DURATION: ${{ inputs.review_max_duration }}
+      PUBLISHING_ENABLED: 'false'
     steps:
-      - name: Confirm publishing is paused
-        run: echo "Publishing is disabled. Tamil question bank is not ready."
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+      - name: Run release guard tests
+        run: python -m unittest discover -s tests -p 'test_release_gate.py'
+      - name: Fetch and verify public assets
+        run: python scripts/fetch_assets.py
+      - name: Render for owner review only
+        run: |
+          args=(--mode render --question-id "$QUESTION_ID" --speech-manifest "$SPEECH_MANIFEST" --review-max-duration "$MAX_DURATION")
+          if [ "$REVIEW_CTA" = 'true' ]; then args+=(--review-cta); fi
+          python scripts/run_pipeline.py "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tamil-gk-review-${{ github.run_id }}
+          path: |
+            output/tamil-preview.mp4
+            output/render-temp/timing.json
+          if-no-files-found: warn
+# No schedule, no uploader and no YouTube secrets in this review workflow.
+# Publication requires a separate reviewed asset and durable reservation ledger.
