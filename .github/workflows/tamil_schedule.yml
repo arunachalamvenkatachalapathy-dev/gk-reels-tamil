@@ -1,0 +1,57 @@
+name: Tamil scheduled ready-asset publishing
+on:
+  schedule:
+    - cron: '2,17,32,47 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: tamil-ready-asset-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Validate publication gates
+        run: python -m unittest discover -s tests -v
+      - name: Prepare durable publication state branch
+        shell: bash
+        run: |
+          git config user.name 'Tamil GK automation'
+          git config user.email 'actions@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin tamil-publication-state >/dev/null; then
+            git fetch origin tamil-publication-state
+            git worktree add /tmp/tamil-state FETCH_HEAD
+          else
+            git worktree add --detach /tmp/tamil-state HEAD
+            cd /tmp/tamil-state
+            git checkout --orphan tamil-publication-state
+            git rm -rf .
+            printf '%s\n' '{"slots":{},"published_ids":[],"checks":[]}' > state.json
+            git add state.json
+            git commit -m 'Initialize Tamil durable publication state'
+            git push origin HEAD:tamil-publication-state
+          fi
+      - name: Check slot, measure drift and publish only exact approved assets
+        env:
+          PUBLICATION_STATE_DIR: /tmp/tamil-state
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python scripts/scheduled_publish.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tamil-timing-${{ github.run_id }}
+          path: /tmp/tamil-state/state.json
+          if-no-files-found: warn
+# UTC :32 maps to IST :02; :47/:02/:17 map to IST :17/:32/:47.
+# First due checks are 06:02 and 15:02 IST; actual runner drift is recorded.
+# Slot openings: 06:00 and 15:00 IST. No manual trigger is needed for routine checks.
+# GitHub scheduled workflows can drift; logs measure, never guarantee exact wall-clock firing.
