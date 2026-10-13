@@ -6,7 +6,7 @@
   },
   "window_minutes": 120,
   "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
-  "publish_enabled": true,
+  "publish_enabled": false,
   "per_video_approval_required": false,
   "ready_queue": "data/ready_assets.json",
   "state_branch": "tamil-publication-state",
