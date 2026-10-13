@@ -68,6 +68,7 @@ jobs:
                   print(json.dumps({'url':'https://www.youtube.com/watch?v='+v['id'],'title':v['snippet']['title'],'status':v['status']},ensure_ascii=False))
           PYVERIFY
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         if: always()
         with:
           name: tamil-timing-${{ github.run_id }}
