@@ -20,15 +20,21 @@ def choose(queue,slot,state):
     published.update(x.get('question_id') for x in state.get('slots',{}).values() if x.get('status') in ('pending','ambiguous','published'))
     return next((a for a in queue if a.get('slot_key')==slot['key'] and a.get('question_id') not in published),None)
 
+def choose_dispatch(queue,state):
+    published=set(state.get('published_ids',[]))
+    published.update(x.get('question_id') for x in state.get('slots',{}).values() if x.get('status') in ('pending','ambiguous','published'))
+    return next((a for a in queue if a.get('question_id') not in published),None)
+
 def verify_asset(a,config):
     if a.get('channel_id')!=config['channel_id']:raise ValueError('Wrong Tamil channel')
     ap=a.get('approval',{});md=a.get('metadata',{})
-    for field in ('user_message_id','approved_at'):
-        if not ap.get(field):raise ValueError('Original per-video approval required')
-    if ap.get('question_id')!=a.get('question_id') or ap.get('video_sha256')!=a.get('sha256') or ap.get('metadata')!=md or ap.get('channel_id')!=config['channel_id']:
-        raise ValueError('Approval must match exact question, video, metadata and destination')
+    if config.get('per_video_approval_required',True):
+        for field in ('user_message_id','approved_at'):
+            if not ap.get(field):raise ValueError('Original per-video approval required')
+        if ap.get('question_id')!=a.get('question_id') or ap.get('video_sha256')!=a.get('sha256') or ap.get('metadata')!=md or ap.get('channel_id')!=config['channel_id']:
+            raise ValueError('Approval must match exact question, video, metadata and destination')
     if md.get('channel_id')!=config['channel_id'] or not 0<len(md.get('title',''))<=100 or len(md.get('description',''))>5000:raise ValueError('Invalid metadata')
-    if not a.get('download_url','').startswith('https://'):raise ValueError('HTTPS ready asset required')
+    if not a.get('repo_path') and not a.get('download_url','').startswith('https://'):raise ValueError('HTTPS ready asset or repo_path required')
     return md
 
 def persist(state_dir,state,note):
@@ -41,11 +47,15 @@ def main():
     now=datetime.now(timezone.utc);slot=selection(now,config,state)
     state.setdefault('checks',[]).append({'at':now.isoformat(),'run_id':os.getenv('GITHUB_RUN_ID'),'scheduled_event':os.getenv('GITHUB_EVENT_NAME'),'slot':slot,'enabled':config['publish_enabled']})
     state['checks']=state['checks'][-500:]
-    if not slot:save(sd/'state.json',state);print('No active IST slot');return
+    manual=os.getenv('GITHUB_EVENT_NAME')=='workflow_dispatch'
+    if not slot and not manual:save(sd/'state.json',state);print('No active IST slot');return
+    if not slot and manual:
+        local=now.astimezone(IST);slot={'key':f'manual:{local.date()}','slot':'manual','opens_at':now.isoformat(),'drift_seconds':0}
     previous=state.setdefault('slots',{}).get(slot['key'],{})
     if previous.get('status') in ('pending','ambiguous'):
         persist(sd,state,'Record blocked pending publication');raise RuntimeError('Reconcile pending receipt before retry')
-    asset=choose(load(ROOT/config['ready_queue']),slot,state)
+    queue=load(ROOT/config['ready_queue'])
+    asset=choose_dispatch(queue,state) if os.getenv('GITHUB_EVENT_NAME')=='workflow_dispatch' else choose(queue,slot,state)
     if not config['publish_enabled'] or not asset:
         persist(sd,state,'Record Tamil gated slot and drift');print('Slot checked; release disabled or no approved ready asset');return
     metadata=verify_asset(asset,config)
@@ -54,8 +64,12 @@ def main():
     for name in ('YT_CLIENT_ID','YT_CLIENT_SECRET','YT_REFRESH_TOKEN'):
         if not os.getenv(name):raise RuntimeError('Missing repository secret: '+name)
     os.environ['YT_CHANNEL_ID']=config['channel_id']
-    video=ROOT/'output/scheduled.mp4';video.parent.mkdir(exist_ok=True)
-    with urllib.request.urlopen(asset['download_url'],timeout=90) as r:video.write_bytes(r.read())
+    if asset.get('repo_path'):
+        video=ROOT/asset['repo_path']
+        if not video.is_file():raise ValueError('Ready asset file missing: '+asset['repo_path'])
+    else:
+        video=ROOT/'output/scheduled.mp4';video.parent.mkdir(exist_ok=True)
+        with urllib.request.urlopen(asset['download_url'],timeout=90) as r:video.write_bytes(r.read())
     if hashlib.sha256(video.read_bytes()).hexdigest()!=asset['sha256']:raise ValueError('Ready video hash mismatch')
     state['slots'][slot['key']]=dict(slot,status='pending',question_id=asset['question_id'],sha256=asset['sha256'],run_id=os.getenv('GITHUB_RUN_ID'))
     persist(sd,state,'Reserve exact Tamil asset before external upload')
