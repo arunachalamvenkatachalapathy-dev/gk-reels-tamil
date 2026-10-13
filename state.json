@@ -1,1 +1,24 @@
-{"slots":{},"published_ids":[],"checks":[]}
+{
+  "slots": {
+    "manual:2026-10-13": {
+      "key": "manual:2026-10-13",
+      "slot": "manual",
+      "opens_at": "2026-10-13T06:48:17.652341+00:00",
+      "drift_seconds": 0,
+      "status": "pending",
+      "question_id": "p0014-e1",
+      "sha256": "97133f556b2e40a72790ad1cc37245d640c8dd42411337f2e39ac30bb68eb199",
+      "run_id": "38358758021"
+    }
+  },
+  "published_ids": [],
+  "checks": [
+    {
+      "at": "2026-10-13T06:48:17.652341+00:00",
+      "run_id": "38358758021",
+      "scheduled_event": "workflow_dispatch",
+      "slot": null,
+      "enabled": true
+    }
+  ]
+}
