@@ -5,13 +5,17 @@
       "slot": "manual",
       "opens_at": "2026-10-13T06:48:17.652341+00:00",
       "drift_seconds": 0,
-      "status": "pending",
+      "status": "published",
       "question_id": "p0014-e1",
       "sha256": "97133f556b2e40a72790ad1cc37245d640c8dd42411337f2e39ac30bb68eb199",
-      "run_id": "38358758021"
+      "run_id": "38358758021",
+      "youtube_id": "CbXgyoOAKn4",
+      "published_at": "2026-10-13T06:48:22.303071+00:00"
     }
   },
-  "published_ids": [],
+  "published_ids": [
+    "p0014-e1"
+  ],
   "checks": [
     {
       "at": "2026-10-13T06:48:17.652341+00:00",
