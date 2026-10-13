@@ -91,7 +91,7 @@ def render_video(question_obj, accent, out_mp4, tmp_dir, bg_music=None, day=1, s
         f.append(f'[4:a]adelay={round(plan["cta_start"]*1000)}:all=1[c]')
         mix.append('c')
     music_index=len(paths)+1
-    f.append(f'[{music_index}:a]atrim=duration={plan["total"]},volume=0.05,afade=t=out:st={plan["total"]-.6}:d=0.6[bed]')
+    f.append(f'[{music_index}:a]atrim=duration={plan["total"]},volume=0.10,afade=t=out:st={plan["total"]-.6}:d=0.6[bed]')
     mix.append('bed')
     for i in range(3):
         f.append(f'sine=frequency=1000:duration=0.08,volume=0.12,afade=t=out:d=0.08,adelay={round((plan["timer_start"]+i)*1000)}:all=1[t{i}]')
