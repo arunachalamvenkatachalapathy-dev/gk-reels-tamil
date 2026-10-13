@@ -32,4 +32,17 @@ class Checks(unittest.TestCase):
   s.verify_asset(a,c)
   a['quality_review']['voice']='Other'
   with self.assertRaises(ValueError):s.verify_asset(a,c)
+ def test_dispatch_defaults_manual(self):self.assertEqual(s.dispatch_mode('workflow_dispatch'),'manual')
+ def test_schedule_ignores_dispatch_mode(self):self.assertEqual(s.dispatch_mode('schedule','manual'),'scheduled')
+ def test_explicit_scheduled_dispatch(self):self.assertEqual(s.dispatch_mode('workflow_dispatch','scheduled'),'scheduled')
+ def test_invalid_dispatch_mode(self):
+  with self.assertRaises(ValueError):s.dispatch_mode('workflow_dispatch','other')
+ def test_scheduled_dispatch_due_slot(self):
+  slot=s.select_run_slot(datetime(2026,10,14,0,32,tzinfo=timezone.utc),C,{},'scheduled')
+  self.assertEqual(slot['key'],'2026-10-14:morning')
+  self.assertEqual(s.choose([{'slot_key':slot['key'],'question_id':'q'}],slot,{})['question_id'],'q')
+ def test_manual_dispatch_never_reserves_due_slot(self):
+  slot=s.select_run_slot(datetime(2026,10,14,0,32,tzinfo=timezone.utc),C,{},'manual')
+  self.assertEqual(slot['key'],'manual:2026-10-14')
+ def test_scheduled_dispatch_outside_window(self):self.assertIsNone(s.select_run_slot(datetime(2026,10,14,3,0,tzinfo=timezone.utc),C,{},'scheduled'))
 if __name__=='__main__':unittest.main()
