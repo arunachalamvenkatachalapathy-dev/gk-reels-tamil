@@ -25,6 +25,17 @@ def choose_dispatch(queue,state):
     published.update(x.get('question_id') for x in state.get('slots',{}).values() if x.get('status') in ('pending','ambiguous','published'))
     return next((a for a in queue if a.get('slot_key','').startswith('manual:') and a.get('question_id') not in published),None)
 
+def dispatch_mode(event,mode=None):
+    if event!='workflow_dispatch':return 'scheduled'
+    mode=mode or 'manual'
+    if mode not in ('manual','scheduled'):raise ValueError('Invalid dispatch mode')
+    return mode
+
+def select_run_slot(now,config,state,mode):
+    if mode=='scheduled':return selection(now,config,state)
+    local=now.astimezone(IST)
+    return {'key':f'manual:{local.date()}','slot':'manual','opens_at':now.isoformat(),'drift_seconds':0}
+
 def verify_asset(a,config):
     if a.get('channel_id')!=config['channel_id']:raise ValueError('Wrong Tamil channel')
     ap=a.get('approval',{});md=a.get('metadata',{})
@@ -48,18 +59,15 @@ def persist(state_dir,state,note):
 
 def main():
     config=load(ROOT/'data/automation_config.json');sd=Path(os.environ['PUBLICATION_STATE_DIR']);state=load(sd/'state.json')
-    now=datetime.now(timezone.utc);slot=selection(now,config,state)
-    state.setdefault('checks',[]).append({'at':now.isoformat(),'run_id':os.getenv('GITHUB_RUN_ID'),'scheduled_event':os.getenv('GITHUB_EVENT_NAME'),'slot':slot,'enabled':config['publish_enabled']})
+    now=datetime.now(timezone.utc);mode=dispatch_mode(os.getenv('GITHUB_EVENT_NAME'),os.getenv('DISPATCH_MODE'));slot=select_run_slot(now,config,state,mode)
+    state.setdefault('checks',[]).append({'at':now.isoformat(),'run_id':os.getenv('GITHUB_RUN_ID'),'scheduled_event':os.getenv('GITHUB_EVENT_NAME'),'slot':slot,'enabled':config['publish_enabled'],'dispatch_mode':mode})
     state['checks']=state['checks'][-500:]
-    manual=os.getenv('GITHUB_EVENT_NAME')=='workflow_dispatch'
-    if not slot and not manual:save(sd/'state.json',state);print('No active IST slot');return
-    if not slot and manual:
-        local=now.astimezone(IST);slot={'key':f'manual:{local.date()}','slot':'manual','opens_at':now.isoformat(),'drift_seconds':0}
+    if not slot:save(sd/'state.json',state);print('No active IST slot');return
     previous=state.setdefault('slots',{}).get(slot['key'],{})
     if previous.get('status') in ('pending','ambiguous'):
         persist(sd,state,'Record blocked pending publication');raise RuntimeError('Reconcile pending receipt before retry')
     queue=load(ROOT/config['ready_queue'])
-    asset=choose_dispatch(queue,state) if os.getenv('GITHUB_EVENT_NAME')=='workflow_dispatch' else choose(queue,slot,state)
+    asset=choose_dispatch(queue,state) if mode=='manual' else choose(queue,slot,state)
     if not config['publish_enabled'] or not asset:
         persist(sd,state,'Record Tamil gated slot and drift');print('Slot checked; release disabled or no approved ready asset');return
     metadata=verify_asset(asset,config)
