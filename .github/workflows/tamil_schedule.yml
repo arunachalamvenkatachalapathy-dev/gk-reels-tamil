@@ -45,6 +45,28 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
         run: python scripts/scheduled_publish.py
+      - name: Verify recorded YouTube receipt and public metadata
+        env:
+          PUBLICATION_STATE_DIR: /tmp/tamil-state
+          YT_CHANNEL_ID: UC5ZLfNHUI4z92IW69KVTGxg
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          python - <<'PYVERIFY'
+          import json,os,sys
+          sys.path.insert(0,'scripts')
+          from upload_youtube import get_youtube_client
+          state=json.load(open(os.environ['PUBLICATION_STATE_DIR']+'/state.json'))
+          ids=[v['youtube_id'] for v in state.get('slots',{}).values() if v.get('status')=='published']
+          if ids:
+              y=get_youtube_client()
+              items=y.videos().list(part='snippet,status',id=','.join(ids)).execute().get('items',[])
+              for v in items:
+                  assert v['snippet']['channelId']==os.environ['YT_CHANNEL_ID']
+                  assert v['status']['privacyStatus']=='public'
+                  print(json.dumps({'url':'https://www.youtube.com/watch?v='+v['id'],'title':v['snippet']['title'],'status':v['status']},ensure_ascii=False))
+          PYVERIFY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
