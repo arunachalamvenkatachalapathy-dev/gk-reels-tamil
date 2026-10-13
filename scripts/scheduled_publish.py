@@ -23,7 +23,7 @@ def choose(queue,slot,state):
 def choose_dispatch(queue,state):
     published=set(state.get('published_ids',[]))
     published.update(x.get('question_id') for x in state.get('slots',{}).values() if x.get('status') in ('pending','ambiguous','published'))
-    return next((a for a in queue if a.get('question_id') not in published),None)
+    return next((a for a in queue if a.get('slot_key','').startswith('manual:') and a.get('question_id') not in published),None)
 
 def verify_asset(a,config):
     if a.get('channel_id')!=config['channel_id']:raise ValueError('Wrong Tamil channel')
