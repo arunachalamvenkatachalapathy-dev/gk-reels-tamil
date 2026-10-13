@@ -76,20 +76,48 @@ def main():
     for name in ('YT_CLIENT_ID','YT_CLIENT_SECRET','YT_REFRESH_TOKEN'):
         if not os.getenv(name):raise RuntimeError('Missing repository secret: '+name)
     os.environ['YT_CHANNEL_ID']=config['channel_id']
+    from upload_youtube import get_youtube_client
+    from meta_publish import preflight, public_video, publish_reel, publish_facebook_reel
+    destinations=preflight()
+    get_youtube_client()  # Verify every target before the first external upload.
+    caption=metadata['description']
+    if len(caption)>2200:raise ValueError('Instagram caption exceeds 2200 characters')
+    public_bytes=public_video(asset.get('download_url',''),asset['sha256'])
     if asset.get('repo_path'):
         video=ROOT/asset['repo_path']
         if not video.is_file():raise ValueError('Ready asset file missing: '+asset['repo_path'])
     else:
         video=ROOT/'output/scheduled.mp4';video.parent.mkdir(exist_ok=True)
-        with urllib.request.urlopen(asset['download_url'],timeout=90) as r:video.write_bytes(r.read())
+        video.write_bytes(public_bytes)
     if hashlib.sha256(video.read_bytes()).hexdigest()!=asset['sha256']:raise ValueError('Ready video hash mismatch')
-    state['slots'][slot['key']]=dict(slot,status='pending',question_id=asset['question_id'],sha256=asset['sha256'],run_id=os.getenv('GITHUB_RUN_ID'))
+    state['slots'][slot['key']]=dict(slot,status='pending',question_id=asset['question_id'],sha256=asset['sha256'],metadata=metadata,destinations=destinations,run_id=os.getenv('GITHUB_RUN_ID'),receipts={})
     persist(sd,state,'Reserve exact Tamil asset before external upload')
     from upload_youtube import upload_short
-    try:receipt=upload_short(str(video),metadata['title'],metadata['description'],metadata.get('tags'))
-    except Exception:
-        state['slots'][slot['key']]['status']='ambiguous';persist(sd,state,'Hold uncertain Tamil upload for reconciliation');raise
-    state['slots'][slot['key']].update(status='published',youtube_id=receipt,published_at=datetime.now(timezone.utc).isoformat())
-    state.setdefault('published_ids',[]).append(asset['question_id']);persist(sd,state,'Record confirmed Tamil publication receipt')
-    print(json.dumps({'question_id':asset['question_id'],'youtube_id':receipt,'drift_seconds':slot['drift_seconds']}))
+    entry=state['slots'][slot['key']]
+    def checkpoint(platform,details):
+        entry['receipts'].setdefault(platform,{}).update(details)
+        persist(sd,state,'Record Tamil '+platform+' upload checkpoint')
+    publishers=[
+        ('youtube',lambda: {'id':upload_short(str(video),metadata['title'],metadata['description'],metadata.get('tags')),'status':'published'}),
+        ('instagram',lambda:publish_reel(asset['download_url'],caption,lambda d:checkpoint('instagram',d))),
+        ('facebook',lambda:publish_facebook_reel(str(video),metadata['title'],metadata['description'],lambda d:checkpoint('facebook',d)))
+    ]
+    for platform,publish in publishers:
+        checkpoint(platform,{'status':'pending','phase':'submitting'})
+        try:
+            receipt=publish()
+            if not receipt.get('id') or receipt.get('status')!='published':
+                raise RuntimeError('Confirmed publication receipt missing')
+        except Exception:
+            entry['status']='ambiguous'
+            if entry['receipts'][platform].get('status')!='published':
+                entry['receipts'][platform]['status']='ambiguous'
+            persist(sd,state,'Hold uncertain Tamil '+platform+' upload for reconciliation')
+            raise RuntimeError('Tamil '+platform+' publication needs reconciliation; no automatic retry') from None
+        checkpoint(platform,dict(receipt,published_at=datetime.now(timezone.utc).isoformat()))
+        if platform=='youtube':entry['youtube_id']=receipt['id']
+    entry.update(status='published',published_at=datetime.now(timezone.utc).isoformat())
+    state.setdefault('published_ids',[]).append(asset['question_id'])
+    persist(sd,state,'Record confirmed Tamil cross-platform publication receipts')
+    print(json.dumps({'question_id':asset['question_id'],'receipts':entry['receipts'],'drift_seconds':slot['drift_seconds']}))
 if __name__=='__main__':main()
