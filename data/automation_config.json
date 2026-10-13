@@ -9,5 +9,10 @@
   "publish_enabled": true,
   "per_video_approval_required": false,
   "ready_queue": "data/ready_assets.json",
-  "state_branch": "tamil-publication-state"
+  "state_branch": "tamil-publication-state",
+  "autonomy_grant": {
+    "user_message_id": "wamid.HBgMOTE2MzgzMDM0MjMwFQIAEhggQUM2MDQwMEU4RkUyQjRFMEYxNTBFODg2RkY1MjJEQUIA",
+    "granted_at": "2026-10-13T12:04:08+05:30",
+    "scope": "Tamil GK, two per day, 06:00/15:00 IST, approved Charon format; private bank remains private"
+  }
 }
