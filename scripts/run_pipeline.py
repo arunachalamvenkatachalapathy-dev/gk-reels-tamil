@@ -28,8 +28,8 @@ def checked_question(question_id):
     review = reviews[question_id]
     if review.get('release_verdict') != 'verified' or not review.get('source_url'):
         raise ValueError('Release verdict and factual source required')
-    if not review.get('scan_verified') or not review.get('semantic_dedup_verified'):
-        raise ValueError('Scan fidelity and semantic dedup gates required')
+    if not (review.get('scan_verified') or review.get('source_rebuild_verified')) or not review.get('semantic_dedup_verified'):
+        raise ValueError('Scan fidelity or explicit source rebuild, plus semantic dedup gates required')
     return q
 
 def verify_release(approval, video, metadata, question_id):
