@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "question_id": "p0014-e1",
+    "slot_key": "manual:2026-10-13:p0014-e1",
+    "repo_path": "ready-assets/tamil-tamil-voice-review.mp4",
+    "sha256": "97133f556b2e40a72790ad1cc37245d640c8dd42411337f2e39ac30bb68eb199",
+    "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
+    "metadata": {
+      "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
+      "title": "Muslim League 1906: யார் நிறுவனர் அல்ல? | Tamil GK Quiz #Shorts",
+      "description": "1906 முஸ்லிம் லீக் நிறுவன உறுப்பினர் அல்லாதவர் யார்?\n\nவிடை: M. A. Jinnah. முஸ்லிம் லீக் 1906இல் உருவானது; ஜின்னா 1913இல் இணைந்தார்.\n\nSource: Government INCOIS educational history lecture\nhttps://incois.gov.in/Tutor/science+society/lectures/illustrations/lecture35/jinnah.html\n\nTamil and English general-knowledge practice. No official TNPSC answer key is claimed.\n#TamilGK #TNPSC #GeneralKnowledge #Quiz #Shorts",
+      "tags": [
+        "Tamil GK",
+        "TNPSC",
+        "Muslim League",
+        "Jinnah",
+        "GK quiz",
+        "Shorts"
+      ]
+    },
+    "approval": {
+      "user_message_id": "wamid.HBgMOTE2MzgzMDM0MjMwFQIAEhggQUM3REZFNzU4MjBCMTI1MTlGNjFDQjUyM0YxRUY5REIA",
+      "approved_at": "2026-10-13T12:01:33+05:30",
+      "question_id": "p0014-e1",
+      "video_sha256": "97133f556b2e40a72790ad1cc37245d640c8dd42411337f2e39ac30bb68eb199",
+      "metadata": {
+        "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
+        "title": "Muslim League 1906: யார் நிறுவனர் அல்ல? | Tamil GK Quiz #Shorts",
+        "description": "1906 முஸ்லிம் லீக் நிறுவன உறுப்பினர் அல்லாதவர் யார்?\n\nவிடை: M. A. Jinnah. முஸ்லிம் லீக் 1906இல் உருவானது; ஜின்னா 1913இல் இணைந்தார்.\n\nSource: Government INCOIS educational history lecture\nhttps://incois.gov.in/Tutor/science+society/lectures/illustrations/lecture35/jinnah.html\n\nTamil and English general-knowledge practice. No official TNPSC answer key is claimed.\n#TamilGK #TNPSC #GeneralKnowledge #Quiz #Shorts",
+        "tags": [
+          "Tamil GK",
+          "TNPSC",
+          "Muslim League",
+          "Jinnah",
+          "GK quiz",
+          "Shorts"
+        ]
+      },
+      "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
+      "scope": "this_video_only",
+      "note": "User approved exact review video; BGM raised slightly per instruction before publish"
+    }
+  }
+]
