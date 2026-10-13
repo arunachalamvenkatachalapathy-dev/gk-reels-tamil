@@ -1,10 +1,13 @@
 {
   "timezone": "Asia/Kolkata",
-  "slots": {"morning": "06:00", "afternoon": "15:00"},
+  "slots": {
+    "morning": "06:00",
+    "afternoon": "15:00"
+  },
   "window_minutes": 120,
   "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
-  "publish_enabled": false,
-  "per_video_approval_required": true,
+  "publish_enabled": true,
+  "per_video_approval_required": false,
   "ready_queue": "data/ready_assets.json",
   "state_branch": "tamil-publication-state"
 }
