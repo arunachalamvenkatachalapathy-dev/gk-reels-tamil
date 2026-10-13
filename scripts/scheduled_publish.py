@@ -33,6 +33,10 @@ def verify_asset(a,config):
             if not ap.get(field):raise ValueError('Original per-video approval required')
         if ap.get('question_id')!=a.get('question_id') or ap.get('video_sha256')!=a.get('sha256') or ap.get('metadata')!=md or ap.get('channel_id')!=config['channel_id']:
             raise ValueError('Approval must match exact question, video, metadata and destination')
+    if not config.get('per_video_approval_required',True):
+        quality=a.get('quality_review',{})
+        if not ap and (quality.get('voice')!='Charon' or quality.get('audio_language')!='Tamil' or not quality.get('visual_verified')):
+            raise ValueError('Automatic asset requires Charon Tamil and visual review')
     if md.get('channel_id')!=config['channel_id'] or not 0<len(md.get('title',''))<=100 or len(md.get('description',''))>5000:raise ValueError('Invalid metadata')
     if not a.get('repo_path') and not a.get('download_url','').startswith('https://'):raise ValueError('HTTPS ready asset or repo_path required')
     return md
