@@ -2,7 +2,6 @@
   {
     "question_id": "p0014-e1",
     "slot_key": "manual:2026-10-13:p0014-e1",
-    "repo_path": "ready-assets/tamil-tamil-voice-review.mp4",
     "sha256": "97133f556b2e40a72790ad1cc37245d640c8dd42411337f2e39ac30bb68eb199",
     "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
     "metadata": {
@@ -39,6 +38,7 @@
       "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
       "scope": "this_video_only",
       "note": "User approved exact review video; BGM raised slightly per instruction before publish"
-    }
+    },
+    "download_url": "https://drive.google.com/uc?export=download&id=1DpwBHO6ksnzKR2aIvivi9SxhtETVzvmR"
   }
 ]
