@@ -77,13 +77,21 @@ jobs:
                   assert v['status']['privacyStatus']=='public'
                   print(json.dumps({'url':'https://www.youtube.com/watch?v='+v['id'],'title':v['snippet']['title'],'status':v['status']},ensure_ascii=False))
           PYVERIFY
-      - uses: actions/upload-artifact@v4
-        continue-on-error: true
+      - name: Write timing and receipt summary without artifact storage
         if: always()
-        with:
-          name: tamil-timing-${{ github.run_id }}
-          path: /tmp/tamil-state/state.json
-          if-no-files-found: warn
+        shell: bash
+        run: |
+          python - <<'PYSUMMARY'
+          import os
+          from pathlib import Path
+          state=Path('/tmp/tamil-state/state.json')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as summary:
+              summary.write('## Tamil publication state\n')
+              if state.is_file():
+                  summary.write('```json\n'+state.read_text()+'\n```\n')
+              else:
+                  summary.write('State unavailable: an earlier gate or state setup failed. Inspect the failed step.\n')
+          PYSUMMARY
 # UTC :32 maps to IST :02; :47/:02/:17 map to IST :17/:32/:47.
 # First due checks are 06:02 and 15:02 IST; actual runner drift is recorded.
 # Slot openings: 06:00 and 15:00 IST. No manual trigger is needed for routine checks.
