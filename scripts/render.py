@@ -1,5 +1,5 @@
 """Bank-driven bilingual English-first/Tamil-fallback renderer; no uploader."""
-import os,json,asyncio,subprocess
+import os,json,asyncio,subprocess,shutil
 """Bilingual TNPSC layout proof: English first, Tamil fallback; no publishing."""
 import sys,json,base64,math,html
 from pathlib import Path
@@ -56,6 +56,14 @@ def studio_html(q,t,plan):
   options=''.join(f'<div class="choice {"correct" if reveal and i==q["correct_index"] else ("wrong" if reveal else "")}"><div class="letter">{"ABCD"[i]}</div><div><div class="en-option">{esc(en)}</div><div class="ta">{esc(ta)}</div></div></div>' for i,(en,ta) in enumerate(OPTS))
   inner=f'<div class="kicker">CHOOSE YOUR ANSWER</div><h1>{esc(EN)}</h1><div class="ta question-ta">{esc(TA)}</div><div class="choices">{options}</div><div class="timer"><div><strong>{"THE ANSWER" if reveal else ("LOCK IT IN" if t>=plan["timer_start"] else "READ. THEN CHOOSE.")}</strong><div class="ta">{"சரியான விடை" if reveal else "விடையை தேர்வு செய்க"}</div></div><div class="ring">{"✓" if reveal else max(1,3-int(t-plan["timer_start"])) if t>=plan["timer_start"] else "?"}</div></div>'
  return f'<meta charset="utf-8"><style>{styles}</style><div class="glow"></div><main><header><img src="data:image/jpeg;base64,{b64(ROOT/"assets/logo.jpg")}"><span>GK SNIPPETS TAMIL</span><b>{esc(q.get("verified_topic",""))}</b></header>{inner}</main>'
+def fit_safe_area(page):
+    # Preserve text. Fit the whole card to the Shorts safe area before capture.
+    bottom=page.evaluate("() => Math.max(...[...document.querySelectorAll('main *')].map(e=>e.getBoundingClientRect().bottom))")
+    scale=min(1.0,(1470-195)/max(1,bottom-195))
+    if scale < .68:raise ValueError('Reviewed content too long for readable safe-area fit')
+    page.evaluate("s => {const m=document.querySelector('main');m.style.transformOrigin='top left';m.style.transform='scale('+s+')'}",scale)
+    return scale
+
 def render_video(question_obj, accent, out_mp4, tmp_dir, bg_music=None, day=1, slot=1, topic_name=None, viral_badge=None, speech_paths=None, include_cta=False, review_only=True, max_duration=15.5):
     from pathlib import Path
     import math
@@ -73,13 +81,17 @@ def render_video(question_obj, accent, out_mp4, tmp_dir, bg_music=None, day=1, s
     plan=timing_plan(*lengths[:3],cta_duration=lengths[3] if include_cta else 0,max_duration=max_duration)
     fps=2
     with sync_playwright() as p:
-        b=p.chromium.launch(args=['--no-sandbox']);page=b.new_page(viewport={'width':1080,'height':1920})
+        b=p.chromium.launch(args=['--no-sandbox']);page=b.new_page(viewport={'width':1080,'height':1920});cache={}
         for i in range(math.ceil(plan['total']*fps)):
-            page.set_content(studio_html(q,i/fps,plan));page.evaluate('document.fonts.ready')
+            markup=studio_html(q,i/fps,plan)
+            target=d/f'{i:04d}.png'
+            if markup in cache:
+                shutil.copyfile(cache[markup],target);continue
+            page.set_content(markup);page.evaluate('document.fonts.ready');fit_safe_area(page)
             if i in (0,math.ceil(plan['why_start']*fps)+1, math.ceil((plan.get('cta_start') or 0)*fps)+1):
                 overflow=page.evaluate("() => [...document.querySelectorAll('main *')].some(e=>{let r=e.getBoundingClientRect();return r.right>900||r.bottom>1480})")
                 if overflow:raise ValueError('Shorts safe-area overflow; shorten reviewed wording')
-            page.screenshot(path=str(d/f'{i:04d}.png'))
+            page.screenshot(path=str(target));cache[markup]=target
         b.close()
     music=bg_music if bg_music and os.path.isfile(bg_music) else os.path.join(ASSETS,'audio','slot1_one_answer_left.mp3')
     cmd=['ffmpeg','-hide_banner','-loglevel','error','-y','-framerate',str(fps),'-i',str(d/'%04d.png')]
