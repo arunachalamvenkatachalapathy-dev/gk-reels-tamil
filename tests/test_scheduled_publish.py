@@ -24,4 +24,12 @@ class Checks(unittest.TestCase):
   self.assertEqual(s.verify_asset(a,C),md)
   a['metadata']['description']='Changed'
   with self.assertRaises(ValueError):s.verify_asset(a,C)
+ def test_dispatch_cannot_publish_future_slot(self):
+  self.assertIsNone(s.choose_dispatch([{'slot_key':'2026-10-14:morning','question_id':'q'}],{}))
+ def test_full_auto_visual_gate(self):
+  c=dict(C,per_video_approval_required=False)
+  a={'channel_id':C['channel_id'],'metadata':{'channel_id':C['channel_id'],'title':'Quiz #Shorts','description':'Desc'},'download_url':'https://example.test/video','quality_review':{'voice':'Charon','audio_language':'Tamil','visual_verified':True}}
+  s.verify_asset(a,c)
+  a['quality_review']['voice']='Other'
+  with self.assertRaises(ValueError):s.verify_asset(a,c)
 if __name__=='__main__':unittest.main()
