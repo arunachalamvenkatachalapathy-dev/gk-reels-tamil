@@ -1,10 +1,10 @@
 {
   "timezone": "Asia/Kolkata",
   "slots": {
-    "morning": "06:00",
-    "afternoon": "15:00"
+    "morning": "07:30",
+    "afternoon": "19:30"
   },
-  "window_minutes": 1440,
+  "window_minutes": 720,
   "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
   "publish_enabled": true,
   "per_video_approval_required": false,
@@ -13,6 +13,6 @@
   "autonomy_grant": {
     "user_message_id": "wamid.HBgMOTE2MzgzMDM0MjMwFQIAEhggQUM2MDQwMEU4RkUyQjRFMEYxNTBFODg2RkY1MjJEQUIA",
     "granted_at": "2026-10-13T12:04:08+05:30",
-    "scope": "Tamil GK, two per day, 06:00/15:00 IST, approved Charon format; private bank remains private"
+    "scope": "Tamil GK, two per day, 07:30/19:30 IST, approved Charon format; private bank remains private"
   }
 }
