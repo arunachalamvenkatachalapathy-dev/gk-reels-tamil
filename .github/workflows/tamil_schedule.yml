@@ -10,6 +10,15 @@ on:
         options:
           - manual
           - scheduled
+          - catch_up
+      slot:
+        description: Slot key for a one-time missed-slot catch-up
+        type: choice
+        required: false
+        default: morning
+        options:
+          - morning
+          - afternoon
   schedule:
     # Same publishing slots as the English and Hindi sister channels. Retry every 15 minutes within each window.
     - cron: '0,15,30,45 2-13 * * *'
@@ -54,9 +63,7 @@ jobs:
         env:
           PUBLICATION_STATE_DIR: /tmp/tamil-state
           DISPATCH_MODE: ${{ inputs.mode }}
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          CATCH_UP_SLOT: ${{ inputs.slot }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
