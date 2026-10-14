@@ -4,9 +4,9 @@
     "morning": "06:00",
     "afternoon": "15:00"
   },
-  "window_minutes": 120,
+  "window_minutes": 1440,
   "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
-  "publish_enabled": false,
+  "publish_enabled": true,
   "per_video_approval_required": false,
   "ready_queue": "data/ready_assets.json",
   "state_branch": "tamil-publication-state",
