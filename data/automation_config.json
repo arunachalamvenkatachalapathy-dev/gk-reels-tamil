@@ -4,7 +4,7 @@
     "morning": "07:30",
     "afternoon": "19:30"
   },
-  "window_minutes": 720,
+  "window_minutes": 120,
   "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
   "publish_enabled": true,
   "per_video_approval_required": false,
