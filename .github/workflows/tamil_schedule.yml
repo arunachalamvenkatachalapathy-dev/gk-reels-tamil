@@ -10,20 +10,6 @@ on:
         options:
           - manual
           - scheduled
-          - catch_up
-      slot:
-        description: Slot key for a one-time missed-slot catch-up
-        type: choice
-        required: false
-        default: morning
-        options:
-          - morning
-          - afternoon
-  schedule:
-    # Same publishing slots as the English and Hindi sister channels. Retry every 15 minutes within each window.
-    - cron: '0,15,30,45 2-13 * * *'
-    - cron: '0,15,30,45 14-17 * * *'
-    - cron: '0,15,30 18 * * *'
 permissions:
   contents: write
 concurrency:
@@ -63,7 +49,9 @@ jobs:
         env:
           PUBLICATION_STATE_DIR: /tmp/tamil-state
           DISPATCH_MODE: ${{ inputs.mode }}
-          CATCH_UP_SLOT: ${{ inputs.slot }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
@@ -81,8 +69,7 @@ jobs:
           sys.path.insert(0,'scripts')
           from upload_youtube import get_youtube_client
           state=json.load(open(os.environ['PUBLICATION_STATE_DIR']+'/state.json'))
-          ids=[v['youtube_id'] for v in state.get('slots',{}).values() if v.get('status')=='published'
-          ]
+          ids=[v['youtube_id'] for v in state.get('slots',{}).values() if v.get('status')=='published']
           if ids:
               y=get_youtube_client()
               items=y.videos().list(part='snippet,status',id=','.join(ids)).execute().get('items',[])
@@ -106,4 +93,5 @@ jobs:
               else:
                   summary.write('State unavailable: an earlier gate or state setup failed. Inspect the failed step.\n')
           PYSUMMARY
-# Native cron is the fallback schedule trigger for the two daily IST publishing windows.
+# Native cron removed while Tamil setup is parked.
+# One external scheduler will dispatch approved 07:30/19:30 IST slots after activation.
