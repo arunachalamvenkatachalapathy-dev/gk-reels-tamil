@@ -10,6 +10,12 @@ on:
         options:
           - manual
           - scheduled
+  schedule:
+    # Mirror EN/HI 5-minute retry cadence. The Python gate accepts only the
+    # configured Tamil slots and their 120-minute windows (07:30 and 19:30 IST).
+    - cron: '3-58/5 2-13 * * *'
+    - cron: '3-58/5 14-17 * * *'
+    - cron: '3-28/5 18 * * *'
 permissions:
   contents: write
 concurrency:
@@ -93,5 +99,3 @@ jobs:
               else:
                   summary.write('State unavailable: an earlier gate or state setup failed. Inspect the failed step.\n')
           PYSUMMARY
-# Native cron removed while Tamil setup is parked.
-# One external scheduler will dispatch approved 07:30/19:30 IST slots after activation.
