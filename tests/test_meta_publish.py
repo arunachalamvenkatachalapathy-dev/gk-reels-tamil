@@ -45,6 +45,52 @@ class MetaChecks(unittest.TestCase):
    r=m.publish_reel('https://example.test/video','caption',checkpoints.append)
   self.assertEqual(r['id'],'media');self.assertEqual(checkpoints[-1]['status'],'published')
   self.assertEqual(checkpoints[0]['container_id'],'container')
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+import types
+import unittest
+from unittest.mock import patch
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
+import meta_publish as m
+import scheduled_publish as s
+ENV={'IG_ACCESS_TOKEN':'test-not-a-secret','FB_PAGE_ID':m.PAGE_ID,'IG_USER_ID':'123',
+     'YT_CLIENT_ID':'test','YT_CLIENT_SECRET':'test','YT_REFRESH_TOKEN':'test'}
+DEBUG={'data':{'is_valid':True,'app_id':m.APP_ID,'type':'PAGE','profile_id':m.PAGE_ID,
+    'expires_at':0,'data_access_expires_at':9999999999,'scopes':['pages_show_list',
+    'pages_read_engagement','pages_manage_posts','instagram_basic','instagram_content_publish']}}
+class MetaChecks(unittest.TestCase):
+ def test_valid_preflight(self):
+  with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',side_effect=[DEBUG,{'id':m.PAGE_ID,'instagram_business_account':{'id':'123'}},{'id':'123','username':m.IG_USERNAME},{'data':[{'quota_usage':0}]}]):
+   self.assertEqual(m.preflight()['page_id'],m.PAGE_ID)
+ def test_missing_ig_before_api(self):
+  with patch.dict(os.environ,{'IG_ACCESS_TOKEN':'test','FB_PAGE_ID':m.PAGE_ID},clear=True),patch.object(m,'graph') as api:
+   with self.assertRaises(RuntimeError):m.preflight()
+   api.assert_not_called()
+ def test_wrong_page_before_api(self):
+  with patch.dict(os.environ,dict(ENV,FB_PAGE_ID='wrong'),clear=True),patch.object(m,'graph') as api:
+   with self.assertRaises(RuntimeError):m.preflight()
+   api.assert_not_called()
+ def test_scope_gate(self):
+  d=json.loads(json.dumps(DEBUG));d['data']['scopes'].remove('instagram_content_publish')
+  with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',return_value=d):
+   with self.assertRaises(RuntimeError):m.preflight()
+ def test_wrong_ig_account(self):
+  with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',side_effect=[DEBUG,{'id':m.PAGE_ID,'instagram_business_account':{'id':'123'}},{'id':'123','username':'wrong'}]):
+   with self.assertRaises(RuntimeError):m.preflight()
+ def test_expired_token(self):
+  d=json.loads(json.dumps(DEBUG));d['data']['data_access_expires_at']=1
+  with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',return_value=d):
+   with self.assertRaises(RuntimeError):m.preflight()
+ def test_ig_checkpoint_before_publish_and_optional_link_failure(self):
+  checkpoints=[]
+  with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',side_effect=[{'id':'container'},{'status_code':'FINISHED'},{'id':'media'},RuntimeError('offline')]):
+   r=m.publish_reel('https://example.test/video','caption',checkpoints.append)
+  self.assertEqual(r['id'],'media');self.assertEqual(checkpoints[-1]['status'],'published')
+  self.assertEqual(checkpoints[0]['container_id'],'container')
  def test_ig_failed_processing_never_publishes(self):
   with patch.dict(os.environ,ENV,clear=True),patch.object(m,'graph',side_effect=[{'id':'container'},{'status_code':'ERROR'}]) as api:
    with self.assertRaises(RuntimeError):m.publish_reel('https://example.test/video','caption',lambda x:None)
@@ -87,8 +133,10 @@ class MetaChecks(unittest.TestCase):
    pipeline=types.SimpleNamespace(checked_question=lambda q:None)
    saved=[]
    def persist(sd,state,note):s.save(sd/'state.json',state);saved.append(json.loads(json.dumps(state)))
-   with patch.dict(os.environ,dict(ENV,PUBLICATION_STATE_DIR=str(root/'state'),GITHUB_EVENT_NAME='workflow_dispatch'),clear=True),patch.object(s,'ROOT',root),patch.object(s,'persist',side_effect=persist),patch.dict(sys.modules,{'upload_youtube':yt,'run_pipeline':pipeline}),patch.object(m,'preflight',return_value={'page_id':m.PAGE_ID}),patch.object(m,'public_video',return_value=b'video'),patch.object(m,'publish_reel',side_effect=RuntimeError('uncertain')),patch.object(m,'publish_facebook_reel') as fb:
+   with patch.dict(os.environ,dict(ENV,PUBLICATION_STATE_DIR=str(root/'state'),GITHUB_EVENT_NAME='workflow_dispatch'),clear=True),patch.object(s,'ROOT',root),patch.object(s,'persist',side_effect=persist),patch.dict(sys.modules,{'upload_youtube':yt,'run_pipeline':pipeline}),patch.object(s.urllib.request,'urlopen') as download,patch.object(m,'preflight',return_value={'page_id':m.PAGE_ID}),patch.object(m,'public_video',return_value=b'video'),patch.object(m.time,'sleep'),patch.object(m,'publish_reel',side_effect=RuntimeError('uncertain')),patch.object(m,'publish_facebook_reel') as fb:
+    download.return_value.__enter__.return_value.read.return_value=b'video'
     with self.assertRaises(RuntimeError):s.main()
+    download.assert_called_once()
     fb.assert_not_called()
     state=json.loads((root/'state/state.json').read_text());entry=next(iter(state['slots'].values()))
     self.assertEqual(entry['status'],'ambiguous');self.assertEqual(entry['receipts']['youtube']['id'],'yt-id')
