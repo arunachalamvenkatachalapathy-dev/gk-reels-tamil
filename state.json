@@ -17,14 +17,17 @@
       "slot": "morning",
       "opens_at": "2026-10-15T07:30:00+05:30",
       "drift_seconds": 2454,
-      "status": "pending",
+      "status": "published",
       "question_id": "p0090-e1",
       "sha256": "b772f688e518969aa7484c98301e001a3035d5469f1c7b8927dd2716fa1d8fca",
-      "run_id": "38672248315"
+      "run_id": "38672248315",
+      "youtube_id": "gstKYGiXef8",
+      "published_at": "2026-10-15T02:40:58.859884+00:00"
     }
   },
   "published_ids": [
-    "p0014-e1"
+    "p0014-e1",
+    "p0090-e1"
   ],
   "checks": [
     {
