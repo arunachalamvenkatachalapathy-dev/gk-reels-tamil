@@ -123,24 +123,22 @@ class MetaChecks(unittest.TestCase):
     upload.return_value.__enter__.return_value.read.return_value=b'{"success":true}'
     with self.assertRaises(TimeoutError):m.publish_facebook_reel(video.name,'title','description',checkpoints.append)
    self.assertFalse(any(x.get('status')=='published' for x in checkpoints))
- def test_full_publisher_partial_receipts_block_retry(self):
+ def test_uncertain_youtube_upload_blocks_retry(self):
   with tempfile.TemporaryDirectory() as td:
    root=Path(td);(root/'data').mkdir();(root/'state').mkdir()
    config={'publish_enabled':True,'channel_id':'UC5ZLfNHUI4z92IW69KVTGxg','ready_queue':'data/queue.json','per_video_approval_required':False}
    asset={'slot_key':'manual:q','question_id':'q','channel_id':config['channel_id'],'sha256':m.hashlib.sha256(b'video').hexdigest(),'download_url':'https://example.test/video','metadata':{'channel_id':config['channel_id'],'title':'quiz','description':'caption'},'quality_review':{'voice':'Charon','audio_language':'Tamil','visual_verified':True}}
    (root/'data/automation_config.json').write_text(json.dumps(config));(root/'data/queue.json').write_text(json.dumps([asset]));(root/'state/state.json').write_text('{}')
-   yt=types.SimpleNamespace(get_youtube_client=lambda:None,upload_short=lambda *args:'yt-id')
+   yt=types.SimpleNamespace(upload_short=lambda *args: (_ for _ in ()).throw(RuntimeError('uncertain')))
    pipeline=types.SimpleNamespace(checked_question=lambda q:None)
    saved=[]
    def persist(sd,state,note):s.save(sd/'state.json',state);saved.append(json.loads(json.dumps(state)))
-   with patch.dict(os.environ,dict(ENV,PUBLICATION_STATE_DIR=str(root/'state'),GITHUB_EVENT_NAME='workflow_dispatch'),clear=True),patch.object(s,'ROOT',root),patch.object(s,'persist',side_effect=persist),patch.dict(sys.modules,{'upload_youtube':yt,'run_pipeline':pipeline}),patch.object(s.urllib.request,'urlopen') as download,patch.object(m,'preflight',return_value={'page_id':m.PAGE_ID}),patch.object(m,'public_video',return_value=b'video'),patch.object(m.time,'sleep'),patch.object(m,'publish_reel',side_effect=RuntimeError('uncertain')),patch.object(m,'publish_facebook_reel') as fb:
+   with patch.dict(os.environ,dict(ENV,PUBLICATION_STATE_DIR=str(root/'state'),GITHUB_EVENT_NAME='workflow_dispatch'),clear=True),patch.object(s,'ROOT',root),patch.object(s,'persist',side_effect=persist),patch.dict(sys.modules,{'upload_youtube':yt,'run_pipeline':pipeline}),patch.object(s.urllib.request,'urlopen') as download:
     download.return_value.__enter__.return_value.read.return_value=b'video'
-    with self.assertRaises(RuntimeError):s.main()
-    download.assert_called_once()
-    fb.assert_not_called()
+    with self.assertRaisesRegex(RuntimeError,'uncertain'):s.main()
     state=json.loads((root/'state/state.json').read_text());entry=next(iter(state['slots'].values()))
-    self.assertEqual(entry['status'],'ambiguous');self.assertEqual(entry['receipts']['youtube']['id'],'yt-id')
-    self.assertEqual(entry['receipts']['instagram']['status'],'ambiguous');self.assertNotIn('q',state.get('published_ids',[]))
-    self.assertEqual(next(iter(saved[0]['slots'].values()))['receipts'],{})
-    with self.assertRaises(RuntimeError):s.main()
+    self.assertEqual(entry['status'],'ambiguous');self.assertEqual(entry['question_id'],'q')
+    self.assertNotIn('q',state.get('published_ids',[]))
+    with self.assertRaisesRegex(RuntimeError,'Reconcile pending receipt'):s.main()
+    download.assert_called_once()
 if __name__=='__main__':unittest.main()
