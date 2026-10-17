@@ -71,6 +71,16 @@
       "run_id": "38993455965",
       "youtube_id": "BZ30U1zqPAg",
       "published_at": "2026-10-17T02:04:29.161669+00:00"
+    },
+    "2026-10-17:afternoon": {
+      "key": "2026-10-17:afternoon",
+      "slot": "afternoon",
+      "opens_at": "2026-10-17T19:30:00+05:30",
+      "drift_seconds": 304,
+      "status": "pending",
+      "question_id": "p0148-e1",
+      "sha256": "92e0ddec3ebe4e67f341b6e27081df7a543e99a753007c02a4822dd4cba24cae",
+      "run_id": "39039225026"
     }
   },
   "published_ids": [
@@ -157,6 +167,19 @@
         "slot": "morning",
         "opens_at": "2026-10-17T07:30:00+05:30",
         "drift_seconds": 264
+      },
+      "enabled": true,
+      "dispatch_mode": "scheduled"
+    },
+    {
+      "at": "2026-10-17T14:05:04.225093+00:00",
+      "run_id": "39039225026",
+      "scheduled_event": "workflow_dispatch",
+      "slot": {
+        "key": "2026-10-17:afternoon",
+        "slot": "afternoon",
+        "opens_at": "2026-10-17T19:30:00+05:30",
+        "drift_seconds": 304
       },
       "enabled": true,
       "dispatch_mode": "scheduled"
