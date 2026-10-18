@@ -18,6 +18,10 @@ class Checks(unittest.TestCase):
  def test_already_used(self):self.assertIsNone(s.choose([{'slot_key':'x','question_id':'q'}],{'key':'x'},{'published_ids':['q']}))
  def test_wrong_channel(self):
   with self.assertRaises(ValueError):s.verify_asset({'channel_id':'wrong'},C)
+ def test_tamil_script_title_rejected(self):
+  c=dict(C,per_video_approval_required=False)
+  a={'channel_id':C['channel_id'],'metadata':{'channel_id':C['channel_id'],'title':'தமிழ் Quiz #Shorts','description':'Desc'},'download_url':'https://example.test/video','quality_review':{'voice':'Charon','audio_language':'Tamil','visual_verified':True}}
+  with self.assertRaisesRegex(ValueError,'title must be English'):s.verify_asset(a,c)
  def test_exact_approval(self):
   md={'channel_id':C['channel_id'],'title':'Quiz #Shorts','description':'Exact description #Shorts'}
   a={'channel_id':C['channel_id'],'question_id':'q','sha256':'a'*64,'metadata':md,'download_url':'https://example.test/video.mp4','approval':{'user_message_id':'original','approved_at':'2026-10-13','question_id':'q','video_sha256':'a'*64,'metadata':md.copy(),'channel_id':C['channel_id']}}
