@@ -49,6 +49,7 @@ def verify_asset(a,config):
         if not ap and (quality.get('voice')!='Charon' or quality.get('audio_language')!='Tamil' or not quality.get('visual_verified')):
             raise ValueError('Automatic asset requires Charon Tamil and visual review')
     if md.get('channel_id')!=config['channel_id'] or not 0<len(md.get('title',''))<=100 or len(md.get('description',''))>5000:raise ValueError('Invalid metadata')
+    if any('\u0b80' <= ch <= '\u0bff' for ch in md.get('title','')):raise ValueError('YouTube title must be English; Tamil script is not allowed')
     if not a.get('repo_path') and not a.get('download_url','').startswith('https://'):raise ValueError('HTTPS ready asset or repo_path required')
     return md
 
