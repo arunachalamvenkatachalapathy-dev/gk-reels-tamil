@@ -14,9 +14,13 @@ The bilingual bank is a source-checked, scan-checked editorial review copy. Fina
 
 Do not describe a review copy as a final learner guide. Adviser claims are not official answer keys. A guide link is added only after the final review and release decision.
 
-## Publishing holds
+## YouTube titles
 
-No upload is authorized by a bank commit. YouTube publishing remains held until the Tamil Charon sample is approved. The pipeline checks the exact Tamil channel, question ID, video hash, title and description against the approval record. A pending external upload must be reconciled before retrying.
+All future YouTube video titles for GK Snippets Tamil must be in English. This rule applies to both daily publishing slots (7:30 AM and 7:30 PM IST). The question, narration, description and tags can remain Tamil or bilingual; this rule changes titles only. The scheduled publisher rejects titles containing Tamil-script characters, and queued assets must use English titles before publishing. Already-published titles are not changed by this rule.
+
+## Publishing state
+
+YouTube publishing is enabled for the Tamil channel's scheduled pipeline. The pipeline checks the exact Tamil channel, question ID, video hash, title and description against the applicable approval or quality record. A pending external upload must be reconciled before retrying.
 
 The requested guide CTA is unchanged. Do not use it for a live release until the final book and its link exist. Review-only rendering does not publish.
 
