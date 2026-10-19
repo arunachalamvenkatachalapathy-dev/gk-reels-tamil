@@ -107,6 +107,16 @@
       "run_id": "39134384303",
       "youtube_id": "wJyjHamgv_g",
       "published_at": "2026-10-18T14:05:14.707923+00:00"
+    },
+    "2026-10-19:morning": {
+      "key": "2026-10-19:morning",
+      "slot": "morning",
+      "opens_at": "2026-10-19T07:30:00+05:30",
+      "drift_seconds": 223,
+      "status": "pending",
+      "question_id": "p0196-e1",
+      "sha256": "7e1e0372d383230f88e37b9acc13d9241b31a88c53ebb624f6897ae98fd32493",
+      "run_id": "39188154685"
     }
   },
   "published_ids": [
@@ -235,6 +245,19 @@
         "slot": "afternoon",
         "opens_at": "2026-10-18T19:30:00+05:30",
         "drift_seconds": 310
+      },
+      "enabled": true,
+      "dispatch_mode": "scheduled"
+    },
+    {
+      "at": "2026-10-19T02:03:43.284682+00:00",
+      "run_id": "39188154685",
+      "scheduled_event": "workflow_dispatch",
+      "slot": {
+        "key": "2026-10-19:morning",
+        "slot": "morning",
+        "opens_at": "2026-10-19T07:30:00+05:30",
+        "drift_seconds": 223
       },
       "enabled": true,
       "dispatch_mode": "scheduled"
