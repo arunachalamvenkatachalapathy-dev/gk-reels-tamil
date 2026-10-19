@@ -119,6 +119,16 @@
       "run_id": "39188154685",
       "youtube_id": "AMZbiI_38-g",
       "published_at": "2026-10-19T02:03:48.748626+00:00"
+    },
+    "2026-10-19:afternoon": {
+      "key": "2026-10-19:afternoon",
+      "slot": "afternoon",
+      "opens_at": "2026-10-19T19:30:00+05:30",
+      "drift_seconds": 313,
+      "status": "pending",
+      "question_id": "p0199-e1",
+      "sha256": "a075a557a9c67beefd467539b92c207efff7e8dcaa064388ee660b3e985d15aa",
+      "run_id": "39265743502"
     }
   },
   "published_ids": [
@@ -261,6 +271,19 @@
         "slot": "morning",
         "opens_at": "2026-10-19T07:30:00+05:30",
         "drift_seconds": 223
+      },
+      "enabled": true,
+      "dispatch_mode": "scheduled"
+    },
+    {
+      "at": "2026-10-19T14:05:13.471117+00:00",
+      "run_id": "39265743502",
+      "scheduled_event": "workflow_dispatch",
+      "slot": {
+        "key": "2026-10-19:afternoon",
+        "slot": "afternoon",
+        "opens_at": "2026-10-19T19:30:00+05:30",
+        "drift_seconds": 313
       },
       "enabled": true,
       "dispatch_mode": "scheduled"
