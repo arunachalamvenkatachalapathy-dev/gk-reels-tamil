@@ -11,11 +11,11 @@ on:
           - manual
           - scheduled
   schedule:
-    # Mirror EN/HI 5-minute retry cadence. The Python gate accepts only the
-    # configured Tamil slots and their 120-minute windows (07:30 and 19:30 IST).
-    - cron: '0-58/5 2-13 * * *'
-    - cron: '3-58/5 14-17 * * *'
-    - cron: '3-28/5 18 * * *'
+    # Backup only: two slot-start crons. Instinct's external trigger is primary.
+    # The Python gate accepts only the configured Tamil slots and their
+    # 120-minute windows (07:30 and 19:30 IST).
+    - cron: '3 2 * * *'   # 07:33 IST morning slot backup
+    - cron: '3 14 * * *'  # 19:33 IST evening slot backup
 permissions:
   contents: write
 concurrency:
