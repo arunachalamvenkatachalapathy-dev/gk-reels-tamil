@@ -342,6 +342,19 @@
       },
       "enabled": true,
       "dispatch_mode": "scheduled"
+    },
+    {
+      "at": "2026-10-21T02:02:32.080674+00:00",
+      "run_id": "39530749665",
+      "scheduled_event": "workflow_dispatch",
+      "slot": {
+        "key": "2026-10-21:morning",
+        "slot": "morning",
+        "opens_at": "2026-10-21T07:30:00+05:30",
+        "drift_seconds": 152
+      },
+      "enabled": true,
+      "dispatch_mode": "scheduled"
     }
   ]
 }
