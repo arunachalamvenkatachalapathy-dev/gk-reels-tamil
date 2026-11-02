@@ -200,8 +200,10 @@ def main():
     if previous.get("status") in ("pending", "ambiguous"):
         persist(sd, state, config, "Record blocked pending Tamil stock publication")
         raise RuntimeError("Reconcile pending receipt before retry")
-    if not config.get("meta_destinations_enabled", False):
-        print("Meta destinations disabled: no verified IG user id or Facebook page for Tamil; YouTube only.")
+    fb_enabled = config.get("facebook_enabled", False)
+    ig_enabled = config.get("instagram_enabled", False)
+    if not ig_enabled:
+        print("Instagram disabled: Tamil IG publishing needs a Page token with instagram_basic and instagram_content_publish (pending owner).")
 
     drive = drive_client()
     stock = list_stock(drive, config["drive_folder_id"])
@@ -254,10 +256,23 @@ def main():
         state["slots"][slot["key"]]["status"] = "ambiguous"
         persist(sd, state, config, "Hold uncertain Tamil stock upload for reconciliation")
         raise
-    state["slots"][slot["key"]].update(status="published", youtube_id=receipt, published_at=datetime.now(timezone.utc).isoformat())
+    destinations = {"youtube": receipt}
+    state["slots"][slot["key"]].update(status="published", youtube_id=receipt, destinations=destinations, published_at=datetime.now(timezone.utc).isoformat())
     state.setdefault("published_ids", []).append(qid)
-    persist(sd, state, config, "Record confirmed Tamil stock publication receipt")
-    print(json.dumps({"question_id": qid, "youtube_id": receipt, "slot": slot["key"], "drift_seconds": slot["drift_seconds"]}))
+    persist(sd, state, config, "Record confirmed Tamil stock YouTube receipt")
+    if fb_enabled:
+        try:
+            import meta_publish
+            meta_publish.preflight_facebook()
+            fb_receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
+            destinations["facebook"] = fb_receipt
+            state["slots"][slot["key"]]["destinations"] = destinations
+            persist(sd, state, config, "Record confirmed Tamil stock Facebook receipt")
+        except Exception as exc:
+            state["slots"][slot["key"]].setdefault("destination_errors", {})["facebook"] = str(exc)[:200]
+            persist(sd, state, config, "Record Tamil stock Facebook destination failure")
+            raise
+    print(json.dumps({"question_id": qid, "youtube_id": receipt, "destinations": {k: (v if isinstance(v, str) else v.get("id")) for k, v in destinations.items()}, "slot": slot["key"], "drift_seconds": slot["drift_seconds"]}))
 
 
 if __name__ == "__main__":

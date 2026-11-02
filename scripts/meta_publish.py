@@ -80,6 +80,28 @@ def preflight():
             'app_id': APP_ID, 'graph_version': 'v26.0'}
 
 
+def preflight_facebook():
+    """Facebook-only gate for the dedicated Tamil Page token (no Instagram scopes)."""
+    token = secret('IG_ACCESS_TOKEN')
+    page = secret('FB_PAGE_ID')
+    if page != PAGE_ID:
+        raise RuntimeError('Tamil Meta destination configuration mismatch')
+    debug = graph('GET', 'debug_token', token, {'input_token': token}).get('data', {})
+    required = {'pages_show_list', 'pages_read_engagement', 'pages_manage_posts'}
+    if (not debug.get('is_valid') or str(debug.get('app_id')) != APP_ID
+            or debug.get('type') != 'PAGE' or str(debug.get('profile_id')) != PAGE_ID
+            or not required.issubset(set(debug.get('scopes', [])))):
+        raise RuntimeError('Dedicated Tamil Page token identity or Facebook scopes not verified')
+    for field in ('expires_at', 'data_access_expires_at'):
+        expiry = debug.get(field)
+        if expiry is None or (expiry != 0 and expiry <= time.time() + 900):
+            raise RuntimeError('Tamil token expiry not safe for this publication')
+    identity = graph('GET', 'me', token, {'fields': 'id,name'})
+    if str(identity.get('id')) != PAGE_ID or identity.get('name') != 'GK Snippets Tamil':
+        raise RuntimeError('Token Page identity mismatch for Tamil Facebook')
+    return {'page_id': page, 'app_id': APP_ID, 'graph_version': 'v26.0'}
+
+
 def public_video(url, expected_hash):
     if not url.startswith('https://'):
         raise ValueError('Instagram requires an approved public HTTPS video URL')
