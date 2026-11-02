@@ -195,8 +195,11 @@ def publish_facebook_reel(video_path, title, description, checkpoint):
     if finish.get('success') is not True:
         raise RuntimeError('Facebook publication acceptance not confirmed')
     checkpoint({'phase': 'accepted'})
-    for attempt in range(5):
-        status = graph('GET', str(video_id), token, {'fields': 'status'}).get('status', {})
+    for attempt in range(6):
+        try:
+            status = graph('GET', str(video_id), token, {'fields': 'status'}).get('status', {})
+        except RuntimeError:
+            status = {}  # page token cannot always read the video node while processing
         if status.get('publishing_phase', {}).get('status') == 'complete':
             receipt = {'id': str(video_id), 'status': 'published'}
             checkpoint(receipt)
@@ -209,6 +212,25 @@ def publish_facebook_reel(video_path, title, description, checkpoint):
             return receipt
         if status.get('video_status') == 'error':
             raise RuntimeError('Facebook processing failed; reconciliation required')
-        if attempt < 4:
-            time.sleep(60)
-    raise TimeoutError('Facebook publication not yet confirmed; reconcile before retry')
+        if attempt < 5:
+            time.sleep(45)
+    # finish already confirmed publication acceptance; the status read is best-effort.
+    return {'id': str(video_id), 'status': 'accepted'}
+
+
+def find_recent_reel(title, published_after=None):
+    # Locate an already-published reel on the Tamil Page by its exact title.
+    # Used to adopt a reel whose upload finished but whose status poll failed,
+    # so a retry never double-posts. Returns a receipt dict or None.
+    page, token = secret('FB_PAGE_ID'), secret('IG_ACCESS_TOKEN')
+    data = graph('GET', page + '/video_reels', token,
+                 {'fields': 'id,title,description,created_time,permalink_url', 'limit': '15'}).get('data', [])
+    for reel in data:
+        if reel.get('title') == title or title in (reel.get('description') or ''):
+            if published_after and reel.get('created_time', '') < published_after:
+                continue
+            receipt = {'id': str(reel['id']), 'status': 'published', 'adopted': True}
+            if reel.get('permalink_url'):
+                receipt['url'] = reel['permalink_url']
+            return receipt
+    return None

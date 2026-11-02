@@ -214,9 +214,14 @@ def retry_facebook_failures(sd, state, config, drive, work):
             video_bytes = zf.read(manifest["file"])
         if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
             raise ValueError(f"Stock video hash mismatch for {qid}")
-        video_path = work / manifest["file"]
-        video_path.write_bytes(video_bytes)
-        receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
+        existing = meta_publish.find_recent_reel(manifest["title"], slot.get("published_at"))
+        if existing:
+            receipt = existing
+            print(f"Facebook retry adopted existing reel for {qid}: {receipt['id']}")
+        else:
+            video_path = work / manifest["file"]
+            video_path.write_bytes(video_bytes)
+            receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
         slot.setdefault("destinations", {})["facebook"] = receipt
         slot.get("destination_errors", {}).pop("facebook", None)
         persist(sd, state, config, f"Record retried Tamil stock Facebook receipt for {qid}")
