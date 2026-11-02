@@ -13,7 +13,10 @@
       "destinations": {
         "youtube": "JDJ-DUJc9hg"
       },
-      "published_at": "2026-11-02T02:48:38.542704+00:00"
+      "published_at": "2026-11-02T02:48:38.542704+00:00",
+      "destination_errors": {
+        "facebook": "Missing repository secret: IG_ACCESS_TOKEN"
+      }
     }
   },
   "published_ids": [
