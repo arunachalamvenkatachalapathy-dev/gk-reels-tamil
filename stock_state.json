@@ -1,0 +1,30 @@
+{
+  "slots": {
+    "manual:2026-11-02": {
+      "key": "manual:2026-11-02",
+      "slot": "manual",
+      "opens_at": "2026-11-02T02:48:33.760122+00:00",
+      "drift_seconds": 0,
+      "status": "pending",
+      "question_id": "p0201-e2",
+      "sha256": "e9a416425e0550fca3be7b131f04454e8c69afb7b6f8b7b9f9856a42683d5c72",
+      "run_id": "41379667853"
+    }
+  },
+  "published_ids": [],
+  "checks": [
+    {
+      "at": "2026-11-02T02:48:33.760122+00:00",
+      "run_id": "41379667853",
+      "event": "workflow_dispatch",
+      "slot": {
+        "key": "manual:2026-11-02",
+        "slot": "manual",
+        "opens_at": "2026-11-02T02:48:33.760122+00:00",
+        "drift_seconds": 0
+      },
+      "mode": "manual"
+    }
+  ],
+  "skipped_external": []
+}
