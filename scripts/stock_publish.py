@@ -67,7 +67,7 @@ def select_slot(now, config, state):
 
 
 def select_run_slot(now, config, state, mode):
-    if mode == "facebook-retry":
+    if mode in ("facebook-retry", "instagram-retry"):
         return None
     if mode == "scheduled":
         return select_slot(now, config, state)
@@ -79,7 +79,7 @@ def dispatch_mode(event, mode=None):
     if event != "workflow_dispatch":
         return "scheduled"
     mode = mode or "manual"
-    if mode not in ("manual", "scheduled", "facebook-retry"):
+    if mode not in ("manual", "scheduled", "facebook-retry", "instagram-retry"):
         raise ValueError("Invalid dispatch mode")
     return mode
 
@@ -187,14 +187,33 @@ def choose_candidates(stock, config, state):
 
 
 
+
+def ig_caption_for(manifest):
+    title = manifest.get("title", "").strip()
+    tags = manifest.get("tags") or []
+    if isinstance(tags, str):
+        tags = [t.strip() for t in tags.split(",") if t.strip()]
+    hashtags = ["#" + re.sub(r"[^0-9A-Za-z]+", "", str(t)) for t in tags]
+    hashtags = [h for h in hashtags if len(h) > 1][:15]
+    return (title + "\n\n" + " ".join(hashtags)).strip()[:2100]
+
 def retry_facebook_failures(sd, state, config, drive, work):
     """Re-attempt Facebook for slots whose YouTube receipt is confirmed but whose
     Facebook destination failed. Never picks a new video; re-fetches the exact
     reserved asset from Drive and re-verifies its hash before upload."""
-    if not config.get("facebook_enabled"):
+    if not (config.get("facebook_enabled") or config.get("instagram_enabled")):
         return
-    pending = [(k, s) for k, s in sorted(state.get("slots", {}).items())
-               if s.get("status") == "published" and "facebook" in s.get("destination_errors", {})]
+    today = datetime.now(IST).date().isoformat()
+    pending = []
+    for k, s in sorted(state.get("slots", {}).items()):
+        if s.get("status") != "published":
+            continue
+        errs = s.get("destination_errors", {})
+        if "facebook" in errs or "instagram" in errs:
+            pending.append((k, s))
+        elif config.get("instagram_enabled") and today in k and "instagram" not in s.get("destinations", {}):
+            errs["instagram"] = "backfill: instagram enabled after publish"
+            pending.append((k, s))
     if not pending:
         return
     sys.path.insert(0, str(ROOT / "scripts"))
@@ -218,18 +237,39 @@ def retry_facebook_failures(sd, state, config, drive, work):
             video_bytes = zf.read(manifest["file"])
         if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
             raise ValueError(f"Stock video hash mismatch for {qid}")
-        existing = meta_publish.find_recent_reel(manifest["title"], slot.get("published_at"))
-        if existing:
-            receipt = existing
-            print(f"Facebook retry adopted existing reel for {qid}: {receipt['id']}")
-        else:
-            video_path = work / manifest["file"]
-            video_path.write_bytes(video_bytes)
-            receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
-        slot.setdefault("destinations", {})["facebook"] = receipt
-        slot.get("destination_errors", {}).pop("facebook", None)
-        persist(sd, state, config, f"Record retried Tamil stock Facebook receipt for {qid}")
-        print(f"Facebook retry published {qid}: {receipt if isinstance(receipt, str) else receipt.get('id')}")
+        errors = slot.get("destination_errors", {})
+        destinations = slot.setdefault("destinations", {})
+        video_path = None
+        if config.get("facebook_enabled") and "facebook" in errors:
+            existing = meta_publish.find_recent_reel(manifest["title"], slot.get("published_at"))
+            if existing:
+                receipt = existing
+                print(f"Facebook retry adopted existing reel for {qid}: {receipt['id']}")
+            else:
+                video_path = work / manifest["file"]
+                video_path.write_bytes(video_bytes)
+                receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
+            destinations["facebook"] = receipt
+            errors.pop("facebook", None)
+            persist(sd, state, config, f"Record retried Tamil stock Facebook receipt for {qid}")
+            print(f"Facebook retry published {qid}: {receipt if isinstance(receipt, str) else receipt.get('id')}")
+        if config.get("instagram_enabled") and "instagram" in errors:
+            existing = meta_publish.find_recent_ig_reel(manifest["title"], slot.get("published_at"))
+            if existing:
+                destinations["instagram"] = existing
+                print(f"Instagram retry adopted existing reel for {qid}: {existing['id']}")
+            else:
+                if video_path is None:
+                    video_path = work / manifest["file"]
+                    video_path.write_bytes(video_bytes)
+                public_url = meta_publish.host_on_github_release(
+                    str(video_path), "ig-host-" + key.replace(":", "-") + "-" + qid, manifest["file"])
+                meta_publish.public_video(public_url, manifest["sha256"])
+                receipt = meta_publish.publish_reel(public_url, ig_caption_for(manifest), lambda cp: None)
+                destinations["instagram"] = receipt
+            errors.pop("instagram", None)
+            persist(sd, state, config, f"Record retried Tamil stock Instagram receipt for {qid}")
+            print(f"Instagram retry published {qid}: {destinations['instagram'].get('id')}")
 
 def main():
     config = load(ROOT / "data/stock_config.json")
@@ -243,7 +283,7 @@ def main():
         {"at": now.isoformat(), "run_id": os.getenv("GITHUB_RUN_ID"), "event": os.getenv("GITHUB_EVENT_NAME"), "slot": slot, "mode": mode}
     )
     state["checks"] = state["checks"][-500:]
-    if config.get("facebook_enabled"):
+    if config.get("facebook_enabled") or config.get("instagram_enabled"):
         retry_drive = drive_client()
         retry_work = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "tamil-stock-retry"
         retry_work.mkdir(parents=True, exist_ok=True)
@@ -327,6 +367,20 @@ def main():
         except Exception as exc:
             state["slots"][slot["key"]].setdefault("destination_errors", {})["facebook"] = str(exc)[:200]
             persist(sd, state, config, "Record Tamil stock Facebook destination failure")
+            raise
+    if ig_enabled:
+        try:
+            import meta_publish as mp
+            mp.preflight()
+            public_url = mp.host_on_github_release(str(video_path), "ig-host-" + slot["key"].replace(":", "-") + "-" + qid, manifest["file"])
+            mp.public_video(public_url, manifest["sha256"])
+            ig_receipt = mp.publish_reel(public_url, ig_caption_for(manifest), lambda cp: None)
+            destinations["instagram"] = ig_receipt
+            state["slots"][slot["key"]]["destinations"] = destinations
+            persist(sd, state, config, "Record confirmed Tamil stock Instagram receipt")
+        except Exception as exc:
+            state["slots"][slot["key"]].setdefault("destination_errors", {})["instagram"] = str(exc)[:200]
+            persist(sd, state, config, "Record Tamil stock Instagram destination failure")
             raise
     print(json.dumps({"question_id": qid, "youtube_id": receipt, "destinations": {k: (v if isinstance(v, str) else v.get("id")) for k, v in destinations.items()}, "slot": slot["key"], "drift_seconds": slot["drift_seconds"]}))
 

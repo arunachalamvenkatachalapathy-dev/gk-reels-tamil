@@ -234,3 +234,52 @@ def find_recent_reel(title, published_after=None):
                 receipt['url'] = reel['permalink_url']
             return receipt
     return None
+
+
+def host_on_github_release(video_path, tag_name, asset_name):
+    """Upload the video as a public GitHub Release asset (repos are public) and
+    return the browser_download_url Instagram can fetch."""
+    repo = os.environ['GITHUB_REPOSITORY']
+    gh = os.environ['GITHUB_TOKEN']
+    headers = {'Authorization': 'Bearer ' + gh, 'Accept': 'application/vnd.github+json'}
+
+    def gh_api(method, path, values=None, raw=None, ctype=None):
+        url = 'https://api.github.com/repos/' + repo + path if path.startswith('/') else path
+        h = dict(headers)
+        data = None
+        if raw is not None:
+            data = raw
+            h['Content-Type'] = ctype or 'application/octet-stream'
+        elif values is not None:
+            data = json.dumps(values).encode()
+            h['Content-Type'] = 'application/json'
+        req = urllib.request.Request(url, data=data, method=method, headers=h)
+        with AUTH_HTTP.open(req, timeout=120) as resp:
+            return json.load(resp)
+
+    try:
+        release = gh_api('POST', '/releases', {'tag_name': tag_name, 'name': tag_name,
+                                               'body': 'Automated reel asset drop.', 'draft': False})
+    except Exception:
+        release = gh_api('GET', '/releases/tags/' + tag_name)
+    upload_base = release['upload_url'].split('{')[0]
+    content = Path(video_path).read_bytes()
+    asset = gh_api('POST', upload_base + '?name=' + asset_name, raw=content, ctype='video/mp4')
+    return asset['browser_download_url']
+
+
+def find_recent_ig_reel(title, published_after=None):
+    # Adopt an already-published IG reel whose caption starts with the title,
+    # so a retry after a mid-flow failure never double-posts.
+    token, ig = secret('IG_ACCESS_TOKEN'), secret('IG_USER_ID')
+    data = graph('GET', ig + '/media', token,
+                 {'fields': 'id,caption,timestamp,permalink', 'limit': '15'}).get('data', [])
+    for m in data:
+        if (m.get('caption') or '').startswith(title):
+            if published_after and m.get('timestamp', '') < published_after:
+                continue
+            receipt = {'id': str(m['id']), 'status': 'published', 'adopted': True}
+            if m.get('permalink'):
+                receipt['url'] = m['permalink']
+            return receipt
+    return None
