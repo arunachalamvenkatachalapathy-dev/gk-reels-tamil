@@ -33,8 +33,12 @@ def save(p, x):
 
 def persist(state_dir, state, config, note):
     save(state_dir / config["state_file"], state)
+    subprocess.run(["git", "-C", str(state_dir), "add", config["state_file"]],
+                   check=True, stdout=subprocess.DEVNULL)
+    dirty = subprocess.run(["git", "-C", str(state_dir), "diff", "--cached", "--quiet"]).returncode != 0
+    if not dirty:
+        return
     for args in (
-        ("add", config["state_file"]),
         ("commit", "-m", note),
         ("push", "origin", "HEAD:" + config["state_branch"]),
     ):
