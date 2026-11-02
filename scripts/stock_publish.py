@@ -63,6 +63,8 @@ def select_slot(now, config, state):
 
 
 def select_run_slot(now, config, state, mode):
+    if mode == "facebook-retry":
+        return None
     if mode == "scheduled":
         return select_slot(now, config, state)
     local = now.astimezone(IST)
@@ -73,7 +75,7 @@ def dispatch_mode(event, mode=None):
     if event != "workflow_dispatch":
         return "scheduled"
     mode = mode or "manual"
-    if mode not in ("manual", "scheduled"):
+    if mode not in ("manual", "scheduled", "facebook-retry"):
         raise ValueError("Invalid dispatch mode")
     return mode
 
@@ -180,6 +182,46 @@ def choose_candidates(stock, config, state):
     return out
 
 
+
+def retry_facebook_failures(sd, state, config, drive, work):
+    """Re-attempt Facebook for slots whose YouTube receipt is confirmed but whose
+    Facebook destination failed. Never picks a new video; re-fetches the exact
+    reserved asset from Drive and re-verifies its hash before upload."""
+    if not config.get("facebook_enabled"):
+        return
+    pending = [(k, s) for k, s in sorted(state.get("slots", {}).items())
+               if s.get("status") == "published" and "facebook" in s.get("destination_errors", {})]
+    if not pending:
+        return
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import meta_publish
+    meta_publish.preflight_facebook()
+    stock = list_stock(drive, config["drive_folder_id"])
+    by_qid = {}
+    for item in stock:
+        q = parse_stock_name(item["name"])
+        if q:
+            by_qid[q] = item
+    for key, slot in pending[:2]:
+        qid = slot.get("question_id")
+        item = by_qid.get(qid)
+        if not item:
+            raise RuntimeError(f"Facebook retry for {key}: stock asset {qid} not found in Drive")
+        zip_path = work / item["name"]
+        download_zip(drive, item["id"], zip_path)
+        with zipfile.ZipFile(zip_path) as zf:
+            manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"])
+            video_bytes = zf.read(manifest["file"])
+        if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
+            raise ValueError(f"Stock video hash mismatch for {qid}")
+        video_path = work / manifest["file"]
+        video_path.write_bytes(video_bytes)
+        receipt = meta_publish.publish_facebook_reel(str(video_path), manifest["title"], manifest["description"], lambda cp: None)
+        slot.setdefault("destinations", {})["facebook"] = receipt
+        slot.get("destination_errors", {}).pop("facebook", None)
+        persist(sd, state, config, f"Record retried Tamil stock Facebook receipt for {qid}")
+        print(f"Facebook retry published {qid}: {receipt if isinstance(receipt, str) else receipt.get('id')}")
+
 def main():
     config = load(ROOT / "data/stock_config.json")
     sd = Path(os.environ["PUBLICATION_STATE_DIR"])
@@ -192,6 +234,11 @@ def main():
         {"at": now.isoformat(), "run_id": os.getenv("GITHUB_RUN_ID"), "event": os.getenv("GITHUB_EVENT_NAME"), "slot": slot, "mode": mode}
     )
     state["checks"] = state["checks"][-500:]
+    if config.get("facebook_enabled"):
+        retry_drive = drive_client()
+        retry_work = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / "tamil-stock-retry"
+        retry_work.mkdir(parents=True, exist_ok=True)
+        retry_facebook_failures(sd, state, config, retry_drive, retry_work)
     if not slot:
         persist(sd, state, config, "Record Tamil stock slot check")
         print("No active IST slot")

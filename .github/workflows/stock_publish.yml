@@ -1,8 +1,9 @@
 name: Tamil stock publishing from Drive
 # Owner plan (2026-10-30/31, WhatsApp): publish the finished Drive stock straight
 # from each GK repo's Actions, keyless Drive access, $0, YouTube/Instagram/Facebook
-# per language. Tamil runs YouTube-only until a verified IG user id and Facebook
-# Page exist (none found 2026-11-02; FB publishing stays off).
+# per language. Tamil Facebook Page verified live 2026-11-02 (owner screenshot);
+# Instagram stays off until the Page token gains instagram_basic and
+# instagram_content_publish (owner action pending).
 on:
   workflow_dispatch:
     inputs:
@@ -14,6 +15,7 @@ on:
         options:
           - manual
           - scheduled
+          - facebook-retry
   schedule:
     - cron: '5 2 * * *'   # 07:35 IST morning slot
     - cron: '5 14 * * *'  # 19:35 IST evening slot
