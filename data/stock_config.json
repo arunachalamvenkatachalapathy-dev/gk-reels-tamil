@@ -1,0 +1,16 @@
+{
+  "drive_folder_id": "1Bf_hyEzVCwUv3bYaSESQk088k-WuBqAu",
+  "channel_id": "UC5ZLfNHUI4z92IW69KVTGxg",
+  "slots": {
+    "morning": "07:30",
+    "afternoon": "19:30"
+  },
+  "window_minutes": 120,
+  "timezone": "Asia/Kolkata",
+  "quarantined_ids": ["p2412-e1", "p3003-e1", "p3310-e1", "p3580-e1", "p0886-e1"],
+  "studio_evening_until": "2026-11-05",
+  "state_branch": "tamil-publication-state",
+  "state_file": "stock_state.json",
+  "recent_upload_scan": 50,
+  "meta_destinations_enabled": false
+}
