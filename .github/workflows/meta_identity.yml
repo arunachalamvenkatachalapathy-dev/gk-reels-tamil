@@ -1,4 +1,4 @@
-name: Read-only Tamil Meta credential identity
+name: Read-only Meta credential identity
 on:
   workflow_dispatch:
 permissions:
@@ -8,10 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Read Meta token identity only (no token values printed)
+      - name: Read Meta token and Instagram linkage only (no token values printed)
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
         run: |
           python - <<'PY'
           import json,os,urllib.error,urllib.parse,urllib.request
@@ -26,21 +27,22 @@ jobs:
                   return {'http_error':e.code}
               except Exception:
                   return {'error':'transport'}
-          out={}
-          if not token:
-              out['token_present']=False
-          else:
-              out['token_present']=True
+          out={'token_present':bool(token)}
+          if token:
               debug=get('debug_token',{'input_token':token}).get('data',{})
               out['debug']={k:debug.get(k) for k in ('is_valid','type','app_id','profile_id','expires_at','data_access_expires_at')}
               out['scopes']=debug.get('scopes',[])
               me=get('me',{'fields':'id,name'})
-              out['me']=me
+              out['page']=me
               if 'id' in me:
-                  out['me_ig_link']=get('me',{'fields':'instagram_business_account'}).get('instagram_business_account')
-              accounts=get('me/accounts',{'fields':'id,name'})
-              out['accounts']=[{'id':a.get('id'),'name':a.get('name')} for a in accounts.get('data',[])] if isinstance(accounts,dict) and 'data' in accounts else accounts
-          out['configured_page_id']=os.environ.get('FB_PAGE_ID','')
+                  pid=me['id']
+                  out['ig_business_account']=get(pid,{'fields':'instagram_business_account'})
+                  out['connected_instagram_account']=get(pid,{'fields':'connected_instagram_account'})
+                  for key in ('ig_business_account','connected_instagram_account'):
+                      node=out.get(key) or {}
+                      ig=(node.get(key) or {}).get('id') if isinstance(node,dict) else None
+                      if ig:
+                          out[key+'_profile']=get(ig,{'fields':'id,username,name'})
           print(json.dumps(out,ensure_ascii=False,indent=2))
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as s:s.write('```json\n'+json.dumps(out,ensure_ascii=False,indent=2)+'\n```\n')
           PY
