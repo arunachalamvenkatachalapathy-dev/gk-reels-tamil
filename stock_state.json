@@ -11,12 +11,16 @@
       "run_id": "41379667853",
       "youtube_id": "JDJ-DUJc9hg",
       "destinations": {
-        "youtube": "JDJ-DUJc9hg"
+        "youtube": "JDJ-DUJc9hg",
+        "facebook": {
+          "id": "1012237831914522",
+          "status": "published",
+          "adopted": true,
+          "url": "/reel/1012237831914522/"
+        }
       },
       "published_at": "2026-11-02T02:48:38.542704+00:00",
-      "destination_errors": {
-        "facebook": "Missing repository secret: IG_ACCESS_TOKEN"
-      }
+      "destination_errors": {}
     }
   },
   "published_ids": [
@@ -34,6 +38,13 @@
         "drift_seconds": 0
       },
       "mode": "manual"
+    },
+    {
+      "at": "2026-11-02T02:52:07.783080+00:00",
+      "run_id": "41379959491",
+      "event": "workflow_dispatch",
+      "slot": null,
+      "mode": "facebook-retry"
     }
   ],
   "skipped_external": []
