@@ -19,5 +19,5 @@
   "state_file": "stock_state.json",
   "recent_upload_scan": 50,
   "facebook_enabled": true,
-  "instagram_enabled": false
+  "instagram_enabled": true
 }
