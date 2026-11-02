@@ -42,8 +42,15 @@ def graph(method, path, token, values=None):
         with AUTH_HTTP.open(request, timeout=60) as response:
             return json.load(response)
     except urllib.error.HTTPError as error:
-        # Never include a URL, request, token, or untrusted API error body.
-        raise RuntimeError('Meta API request failed: HTTP ' + str(error.code)) from None
+        # Never include the URL or request; the Meta error body carries no token.
+        detail = ''
+        try:
+            body = json.loads(error.read().decode())
+            err = body.get('error', {})
+            detail = ' [' + str(err.get('code')) + '/' + str(err.get('error_subcode')) + ' ' + str(err.get('type')) + ': ' + str(err.get('message'))[:180] + ']'
+        except Exception:
+            pass
+        raise RuntimeError('Meta API request failed: HTTP ' + str(error.code) + detail) from None
     except Exception:
         raise RuntimeError('Meta API transport or response failure') from None
 
