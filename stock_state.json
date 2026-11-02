@@ -17,6 +17,12 @@
           "status": "published",
           "adopted": true,
           "url": "/reel/1012237831914522/"
+        },
+        "instagram": {
+          "id": "18110337394936802",
+          "container_id": "18153277432520782",
+          "status": "published",
+          "url": "https://www.instagram.com/reel/DfOh7wbDdZP/"
         }
       },
       "published_at": "2026-11-02T02:48:38.542704+00:00",
@@ -52,6 +58,13 @@
       "event": "workflow_dispatch",
       "slot": null,
       "mode": "facebook-retry"
+    },
+    {
+      "at": "2026-11-02T05:13:39.008818+00:00",
+      "run_id": "41392736860",
+      "event": "workflow_dispatch",
+      "slot": null,
+      "mode": "instagram-retry"
     }
   ],
   "skipped_external": []
