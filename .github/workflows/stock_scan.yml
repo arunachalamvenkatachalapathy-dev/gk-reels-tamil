@@ -1,0 +1,19 @@
+name: Read-only Tamil stock ZIP audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install google-api-python-client google-auth requests
+      - name: Audit every stock ZIP manifest (read-only)
+        env:
+          GDRIVE_SA_KEY_JSON: ${{ secrets.GDRIVE_SA_KEY_JSON }}
+        run: python scripts/stock_scan.py
