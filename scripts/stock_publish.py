@@ -325,11 +325,18 @@ def main():
     for qid, item in candidates:
         zip_path = work / item["name"]
         download_zip(drive, item["id"], zip_path)
-        with zipfile.ZipFile(zip_path) as zf:
-            manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"])
-            video_bytes = zf.read(manifest["file"])
-        if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
-            raise ValueError(f"Stock video hash mismatch for {qid}")
+        try:
+            with zipfile.ZipFile(zip_path) as zf:
+                manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"])
+                video_bytes = zf.read(manifest["file"])
+            if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
+                raise ValueError(f"Stock video hash mismatch for {qid}")
+        except (ValueError, KeyError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+            rejected = state.setdefault("rejected", [])
+            rejected.append({"question_id": qid, "file": item["name"], "error": str(exc)[:200], "at": now.isoformat()})
+            state["rejected"] = rejected[-500:]
+            print(f"Reject {qid} ({item['name']}): {exc}")
+            continue
         if manifest["title"] in known_titles:
             state.setdefault("skipped_external", []).append({"question_id": qid, "reason": "title already on channel", "at": now.isoformat()})
             print(f"Skip {qid}: its title is already uploaded on the channel (owner-scheduled copy).")
