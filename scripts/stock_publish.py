@@ -91,7 +91,27 @@ def validate_title(title):
         raise ValueError("YouTube title must be English; Tamil script is not allowed")
 
 
-def validate_manifest(manifest, channel_id):
+def apply_title_overrides(manifest, overrides, qid=None):
+    """Swap a stock manifest title for its owner-approved override (2026-11-03:
+    46 Drive-stock titles over the 100-char YouTube limit got shorter approved
+    replacements). Keyed by question id; a missing or unrelated id leaves the
+    manifest untouched. The override still goes through validate_title below."""
+    if not overrides:
+        return manifest
+    videos = manifest.get("videos") or []
+    if len(videos) != 1:
+        return manifest
+    key = qid or videos[0].get("question_id")
+    new_title = overrides.get(key)
+    if not new_title:
+        return manifest
+    manifest = dict(manifest)
+    manifest["videos"] = [dict(videos[0], title=new_title)]
+    return manifest
+
+
+def validate_manifest(manifest, channel_id, title_overrides=None, qid=None):
+    manifest = apply_title_overrides(manifest, title_overrides, qid)
     if manifest.get("destination_channel_id") != channel_id:
         raise ValueError("Stock manifest targets a different channel")
     videos = manifest.get("videos") or []
@@ -233,7 +253,7 @@ def retry_facebook_failures(sd, state, config, drive, work):
         zip_path = work / item["name"]
         download_zip(drive, item["id"], zip_path)
         with zipfile.ZipFile(zip_path) as zf:
-            manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"])
+            manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"], config.get("title_overrides"), qid)
             video_bytes = zf.read(manifest["file"])
         if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
             raise ValueError(f"Stock video hash mismatch for {qid}")
@@ -327,7 +347,7 @@ def main():
         download_zip(drive, item["id"], zip_path)
         try:
             with zipfile.ZipFile(zip_path) as zf:
-                manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"])
+                manifest = validate_manifest(json.loads(zf.read("manifest.json").decode("utf-8")), config["channel_id"], config.get("title_overrides"), qid)
                 video_bytes = zf.read(manifest["file"])
             if hashlib.sha256(video_bytes).hexdigest() != manifest["sha256"]:
                 raise ValueError(f"Stock video hash mismatch for {qid}")

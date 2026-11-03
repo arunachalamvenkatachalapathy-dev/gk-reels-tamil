@@ -108,5 +108,61 @@ class SlotGate(unittest.TestCase):
         self.assertIsNone(sp.select_slot(ist(2026, 11, 2, 12, 0), CONFIG, {"slots": {}}))
 
 
+class TitleOverride(unittest.TestCase):
+    def manifest(self, title, qid="p0226-e1"):
+        return {
+            "destination_channel_id": CONFIG["channel_id"],
+            "videos": [{"question_id": qid, "title": title, "description": "d", "file": "a.mp4", "sha256": "0" * 64, "duration": 27.4}],
+        }
+
+    def test_override_replaces_overlong_title(self):
+        overrides = {"p0226-e1": "What Does the Song 'A War Without Bloodshed' Promote? | Tamil GK #Shorts"}
+        v = sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"], overrides, "p0226-e1")
+        self.assertEqual(v["title"], overrides["p0226-e1"])
+
+    def test_override_matched_by_manifest_question_id(self):
+        overrides = {"p0226-e1": "Short Title | Tamil GK #Shorts"}
+        v = sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"], overrides)
+        self.assertEqual(v["title"], "Short Title | Tamil GK #Shorts")
+
+    def test_unrelated_override_leaves_bad_title_rejected(self):
+        with self.assertRaises(ValueError):
+            sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"], {"p9999-e1": "Other | Tamil GK #Shorts"}, "p0226-e1")
+
+    def test_override_itself_validated(self):
+        with self.assertRaises(ValueError):
+            sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"], {"p0226-e1": "y" * 101}, "p0226-e1")
+        with self.assertRaises(ValueError):
+            sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"], {"p0226-e1": "யார்? | Tamil GK #Shorts"}, "p0226-e1")
+
+    def test_no_overrides_unchanged_behaviour(self):
+        with self.assertRaises(ValueError):
+            sp.validate_manifest(self.manifest("x" * 120), CONFIG["channel_id"])
+        v = sp.validate_manifest(self.manifest("Q? #Shorts"), CONFIG["channel_id"], None, "p0226-e1")
+        self.assertEqual(v["title"], "Q? #Shorts")
+
+
+class StockConfigData(unittest.TestCase):
+    """The real stock_config.json: overrides and quarantine stay disjoint and
+    every override passes the publisher's own title gate."""
+
+    def test_real_config_overrides_valid_and_disjoint(self):
+        cfg = json.loads((Path(sp.ROOT) / "data/stock_config.json").read_text())
+        overrides = cfg.get("title_overrides", {})
+        self.assertEqual(len(overrides), 46)
+        self.assertFalse(set(overrides) & set(cfg.get("quarantined_ids", [])))
+        for qid, title in overrides.items():
+            sp.validate_title(title)
+            self.assertRegex(qid, r"^p\d+-e\d+$")
+
+
+class CandidateChoiceWithOverrides(unittest.TestCase):
+    def test_reinstated_ids_pickable_again(self):
+        cfg = dict(CONFIG, title_overrides={"p0226-e1": "Short | Tamil GK #Shorts"})
+        stock = [{"id": "1", "name": "GK_TA_private_p0226-e1.zip"}, {"id": "2", "name": "GK_TA_private_p2412-e1.zip"}]
+        out = sp.choose_candidates(stock, cfg, {"slots": {}})
+        self.assertEqual([q for q, _ in out], ["p0226-e1"])
+
+
 if __name__ == "__main__":
     unittest.main()

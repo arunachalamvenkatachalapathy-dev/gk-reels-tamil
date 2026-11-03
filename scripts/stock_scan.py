@@ -25,7 +25,7 @@ def main():
             data = drive.files().get_media(fileId=item["id"]).execute()
             with zipfile.ZipFile(io.BytesIO(data)) as zf:
                 manifest = json.loads(zf.read("manifest.json").decode("utf-8"))
-            v = validate_manifest(manifest, config["channel_id"])
+            v = validate_manifest(manifest, config["channel_id"], config.get("title_overrides"), qid)
             title = v.get("title", "")
             flag = " QUARANTINED" if qid in quarantined else ""
             print(f"OK   {qid} {item['name']} title_len={len(title)}{flag} :: {title[:70]}")
