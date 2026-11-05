@@ -91,7 +91,12 @@
       "run_id": "41952509497",
       "youtube_id": "FBbKtpoUY2A",
       "destinations": {
-        "youtube": "FBbKtpoUY2A"
+        "youtube": "FBbKtpoUY2A",
+        "facebook": {
+          "id": "3642522222565671",
+          "status": "published",
+          "url": "/reel/3642522222565671/"
+        }
       },
       "published_at": "2026-11-05T02:02:38.464742+00:00"
     }
