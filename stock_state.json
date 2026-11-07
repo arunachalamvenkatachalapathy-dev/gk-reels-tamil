@@ -195,7 +195,12 @@
       "run_id": "42379705137",
       "youtube_id": "tY52lzM2-jo",
       "destinations": {
-        "youtube": "tY52lzM2-jo"
+        "youtube": "tY52lzM2-jo",
+        "facebook": {
+          "id": "1444151793821238",
+          "status": "published",
+          "url": "/reel/1444151793821238/"
+        }
       },
       "published_at": "2026-11-07T14:02:48.393670+00:00"
     }
