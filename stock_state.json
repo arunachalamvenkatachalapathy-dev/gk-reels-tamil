@@ -169,7 +169,12 @@
       "run_id": "42327189707",
       "youtube_id": "V-Z4TT34B1I",
       "destinations": {
-        "youtube": "V-Z4TT34B1I"
+        "youtube": "V-Z4TT34B1I",
+        "facebook": {
+          "id": "2065539437484825",
+          "status": "published",
+          "url": "/reel/2065539437484825/"
+        }
       },
       "published_at": "2026-11-07T02:02:51.145085+00:00"
     }
