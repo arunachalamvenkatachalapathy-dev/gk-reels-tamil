@@ -221,7 +221,12 @@
       "run_id": "42436790927",
       "youtube_id": "CQhxZ_EUTlo",
       "destinations": {
-        "youtube": "CQhxZ_EUTlo"
+        "youtube": "CQhxZ_EUTlo",
+        "facebook": {
+          "id": "2055435785163931",
+          "status": "published",
+          "url": "/reel/2055435785163931/"
+        }
       },
       "published_at": "2026-11-08T02:02:35.239422+00:00"
     }
