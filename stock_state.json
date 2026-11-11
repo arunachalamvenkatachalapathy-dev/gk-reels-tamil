@@ -403,7 +403,12 @@
       "run_id": "43034594760",
       "youtube_id": "i4DXwjvq9x0",
       "destinations": {
-        "youtube": "i4DXwjvq9x0"
+        "youtube": "i4DXwjvq9x0",
+        "facebook": {
+          "id": "1672810021215513",
+          "status": "published",
+          "url": "/reel/1672810021215513/"
+        }
       },
       "published_at": "2026-11-11T14:02:30.003590+00:00"
     }
