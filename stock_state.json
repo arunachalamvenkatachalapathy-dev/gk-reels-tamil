@@ -377,7 +377,12 @@
       "run_id": "42943217525",
       "youtube_id": "ZY-AoIx0AjQ",
       "destinations": {
-        "youtube": "ZY-AoIx0AjQ"
+        "youtube": "ZY-AoIx0AjQ",
+        "facebook": {
+          "id": "1475857727786655",
+          "status": "published",
+          "url": "/reel/1475857727786655/"
+        }
       },
       "published_at": "2026-11-11T02:02:51.894493+00:00"
     }
