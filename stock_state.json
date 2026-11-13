@@ -481,7 +481,12 @@
       "run_id": "43349230583",
       "youtube_id": "74FWTEkMFWI",
       "destinations": {
-        "youtube": "74FWTEkMFWI"
+        "youtube": "74FWTEkMFWI",
+        "facebook": {
+          "id": "2128755107769465",
+          "status": "published",
+          "url": "/reel/2128755107769465/"
+        }
       },
       "published_at": "2026-11-13T02:02:36.117871+00:00"
     }
