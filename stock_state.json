@@ -495,6 +495,16 @@
         }
       },
       "published_at": "2026-11-13T02:02:36.117871+00:00"
+    },
+    "2026-11-13:afternoon": {
+      "key": "2026-11-13:afternoon",
+      "slot": "afternoon",
+      "opens_at": "2026-11-13T19:30:00+05:30",
+      "drift_seconds": 176,
+      "status": "pending",
+      "question_id": "p0624-e1",
+      "sha256": "2f67e8ea84d3e97369810a1f4fb735be4fd65f5f8b14177a1e751543b90c9db0",
+      "run_id": "43439017124"
     }
   },
   "published_ids": [
@@ -948,6 +958,18 @@
       "run_id": "43399954884",
       "event": "schedule",
       "slot": null,
+      "mode": "scheduled"
+    },
+    {
+      "at": "2026-11-13T14:02:56.453229+00:00",
+      "run_id": "43439017124",
+      "event": "workflow_dispatch",
+      "slot": {
+        "key": "2026-11-13:afternoon",
+        "slot": "afternoon",
+        "opens_at": "2026-11-13T19:30:00+05:30",
+        "drift_seconds": 176
+      },
       "mode": "scheduled"
     }
   ],
