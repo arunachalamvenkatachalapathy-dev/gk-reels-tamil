@@ -611,7 +611,12 @@
       "run_id": "43722159765",
       "youtube_id": "5Qcj7Sb6z-M",
       "destinations": {
-        "youtube": "5Qcj7Sb6z-M"
+        "youtube": "5Qcj7Sb6z-M",
+        "facebook": {
+          "id": "1756671352091885",
+          "status": "published",
+          "url": "/reel/1756671352091885/"
+        }
       },
       "published_at": "2026-11-15T14:02:48.572006+00:00"
     }
