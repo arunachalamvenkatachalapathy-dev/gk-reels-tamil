@@ -663,7 +663,12 @@
       "run_id": "43881741015",
       "youtube_id": "d_XRmccFW48",
       "destinations": {
-        "youtube": "d_XRmccFW48"
+        "youtube": "d_XRmccFW48",
+        "facebook": {
+          "id": "1124768970422925",
+          "status": "published",
+          "url": "/reel/1124768970422925/"
+        }
       },
       "published_at": "2026-11-16T14:49:21.351237+00:00"
     }
