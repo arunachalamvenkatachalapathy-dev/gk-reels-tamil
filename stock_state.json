@@ -689,7 +689,12 @@
       "run_id": "44000090481",
       "youtube_id": "I3wew_AobX0",
       "destinations": {
-        "youtube": "I3wew_AobX0"
+        "youtube": "I3wew_AobX0",
+        "facebook": {
+          "id": "3228748277324507",
+          "status": "published",
+          "url": "/reel/3228748277324507/"
+        }
       },
       "published_at": "2026-11-17T02:03:15.776633+00:00"
     }
