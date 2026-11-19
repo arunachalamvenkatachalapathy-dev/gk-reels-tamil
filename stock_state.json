@@ -820,7 +820,12 @@
       "run_id": "44539565244",
       "youtube_id": "VKg3oJkP_Yg",
       "destinations": {
-        "youtube": "VKg3oJkP_Yg"
+        "youtube": "VKg3oJkP_Yg",
+        "facebook": {
+          "id": "1011807215312374",
+          "status": "published",
+          "url": "/reel/1011807215312374/"
+        }
       },
       "published_at": "2026-11-19T14:03:13.688675+00:00"
     }
