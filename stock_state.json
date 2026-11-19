@@ -800,7 +800,10 @@
           "url": "/reel/1850931895898538/"
         }
       },
-      "published_at": "2026-11-19T02:03:01.284996+00:00"
+      "published_at": "2026-11-19T02:03:01.284996+00:00",
+      "destination_errors": {
+        "instagram": "Public video URL could not be verified anonymously"
+      }
     }
   },
   "published_ids": [
