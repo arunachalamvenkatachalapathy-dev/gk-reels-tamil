@@ -264,6 +264,18 @@ def host_on_github_release(video_path, tag_name, asset_name):
         release = gh_api('GET', '/releases/tags/' + tag_name)
     upload_base = release['upload_url'].split('{')[0]
     content = Path(video_path).read_bytes()
+    # A failed anonymous-host check can leave the exact asset uploaded.
+    # Reuse it instead of uploading the same name again (GitHub returns 422).
+    expected_digest = 'sha256:' + hashlib.sha256(content).hexdigest()
+    for existing in release.get('assets', []):
+        if existing.get('name') != asset_name:
+            continue
+        if existing.get('size') != len(content):
+            raise ValueError('Existing release asset size mismatch')
+        if existing.get('digest') and existing['digest'] != expected_digest:
+            raise ValueError('Existing release asset hash mismatch')
+        # The caller still verifies the full bytes anonymously before Meta.
+        return existing['browser_download_url']
     asset = gh_api('POST', upload_base + '?name=' + asset_name, raw=content, ctype='video/mp4')
     return asset['browser_download_url']
 
