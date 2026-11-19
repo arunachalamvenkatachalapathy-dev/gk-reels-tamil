@@ -798,12 +798,16 @@
           "id": "1850931895898538",
           "status": "published",
           "url": "/reel/1850931895898538/"
+        },
+        "instagram": {
+          "id": "17992287144072796",
+          "container_id": "18157833658520782",
+          "status": "published",
+          "url": "https://www.instagram.com/reel/Df6BYwOHKFQ/"
         }
       },
       "published_at": "2026-11-19T02:03:01.284996+00:00",
-      "destination_errors": {
-        "instagram": "Public video URL could not be verified anonymously"
-      }
+      "destination_errors": {}
     }
   },
   "published_ids": [
@@ -1491,6 +1495,13 @@
         "drift_seconds": 175
       },
       "mode": "scheduled"
+    },
+    {
+      "at": "2026-11-19T02:35:00.178835+00:00",
+      "run_id": "44445347879",
+      "event": "workflow_dispatch",
+      "slot": null,
+      "mode": "instagram-retry"
     }
   ],
   "skipped_external": []
