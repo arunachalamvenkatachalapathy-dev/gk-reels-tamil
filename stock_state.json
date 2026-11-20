@@ -872,7 +872,12 @@
       "run_id": "44749897034",
       "youtube_id": "XwCBX6NDco4",
       "destinations": {
-        "youtube": "XwCBX6NDco4"
+        "youtube": "XwCBX6NDco4",
+        "facebook": {
+          "id": "2143624589592550",
+          "status": "published",
+          "url": "/reel/2143624589592550/"
+        }
       },
       "published_at": "2026-11-20T14:04:15.159221+00:00"
     }
