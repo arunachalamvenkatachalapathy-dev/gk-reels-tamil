@@ -950,7 +950,12 @@
       "run_id": "44974208072",
       "youtube_id": "WUyWcPPeP9s",
       "destinations": {
-        "youtube": "WUyWcPPeP9s"
+        "youtube": "WUyWcPPeP9s",
+        "facebook": {
+          "id": "1573904554563381",
+          "status": "published",
+          "url": "/reel/1573904554563381/"
+        }
       },
       "published_at": "2026-11-22T02:02:48.421275+00:00"
     }
