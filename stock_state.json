@@ -976,7 +976,12 @@
       "run_id": "45030722576",
       "youtube_id": "0WY7zDM7rd8",
       "destinations": {
-        "youtube": "0WY7zDM7rd8"
+        "youtube": "0WY7zDM7rd8",
+        "facebook": {
+          "id": "3311232725740291",
+          "status": "published",
+          "url": "/reel/3311232725740291/"
+        }
       },
       "published_at": "2026-11-22T14:03:44.890371+00:00"
     }
