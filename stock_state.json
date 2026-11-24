@@ -1080,7 +1080,12 @@
       "run_id": "45410142110",
       "youtube_id": "doRsLDaJznY",
       "destinations": {
-        "youtube": "doRsLDaJznY"
+        "youtube": "doRsLDaJznY",
+        "facebook": {
+          "id": "1813535576419618",
+          "status": "published",
+          "url": "/reel/1813535576419618/"
+        }
       },
       "published_at": "2026-11-24T14:05:16.386068+00:00"
     }
