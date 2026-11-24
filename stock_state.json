@@ -1054,7 +1054,12 @@
       "run_id": "45309658514",
       "youtube_id": "M5Eu-la6wh4",
       "destinations": {
-        "youtube": "M5Eu-la6wh4"
+        "youtube": "M5Eu-la6wh4",
+        "facebook": {
+          "id": "1140706882190125",
+          "status": "published",
+          "url": "/reel/1140706882190125/"
+        }
       },
       "published_at": "2026-11-24T02:04:38.259228+00:00"
     }
