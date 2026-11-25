@@ -1106,7 +1106,12 @@
       "run_id": "45530243526",
       "youtube_id": "x8o1hD-DKPI",
       "destinations": {
-        "youtube": "x8o1hD-DKPI"
+        "youtube": "x8o1hD-DKPI",
+        "facebook": {
+          "id": "1866280537707020",
+          "status": "published",
+          "url": "/reel/1866280537707020/"
+        }
       },
       "published_at": "2026-11-25T02:04:10.530727+00:00"
     }
