@@ -1165,7 +1165,10 @@
           "url": "/reel/2168632897107037/"
         }
       },
-      "published_at": "2026-11-26T02:03:33.358838+00:00"
+      "published_at": "2026-11-26T02:03:33.358838+00:00",
+      "destination_errors": {
+        "instagram": "Meta API request failed: HTTP 500 [2/None OAuthException: An unexpected error has occurred. Please retry your request later.]"
+      }
     }
   },
   "published_ids": [
