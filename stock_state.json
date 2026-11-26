@@ -1163,12 +1163,16 @@
           "id": "2168632897107037",
           "status": "published",
           "url": "/reel/2168632897107037/"
+        },
+        "instagram": {
+          "id": "18180958699465364",
+          "container_id": "18159322246520782",
+          "status": "published",
+          "url": "https://www.instagram.com/reel/DgMBFrRAr16/"
         }
       },
       "published_at": "2026-11-26T02:03:33.358838+00:00",
-      "destination_errors": {
-        "instagram": "Meta API request failed: HTTP 500 [2/None OAuthException: An unexpected error has occurred. Please retry your request later.]"
-      }
+      "destination_errors": {}
     }
   },
   "published_ids": [
@@ -2143,6 +2147,13 @@
         "drift_seconds": 208
       },
       "mode": "scheduled"
+    },
+    {
+      "at": "2026-11-26T02:19:36.104506+00:00",
+      "run_id": "45741628919",
+      "event": "workflow_dispatch",
+      "slot": null,
+      "mode": "instagram-retry"
     }
   ],
   "skipped_external": []
