@@ -1231,10 +1231,15 @@
       "slot": "afternoon",
       "opens_at": "2026-11-27T19:30:00+05:30",
       "drift_seconds": 189,
-      "status": "pending",
+      "status": "published",
       "question_id": "p1086-e1",
       "sha256": "8c8fc9bac1c6db8fae8d065e51d8bdce094ed572ce83d66682a7da59541e1681",
-      "run_id": "46012385702"
+      "run_id": "46012385702",
+      "youtube_id": "VKHsIQFLEXI",
+      "destinations": {
+        "youtube": "VKHsIQFLEXI"
+      },
+      "published_at": "2026-11-27T14:03:15.514068+00:00"
     }
   },
   "published_ids": [
@@ -1284,7 +1289,8 @@
     "p1046-e1",
     "p1077-e2",
     "p1078-e2",
-    "p1084-e1"
+    "p1084-e1",
+    "p1086-e1"
   ],
   "checks": [
     {
