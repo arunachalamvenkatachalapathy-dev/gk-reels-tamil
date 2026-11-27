@@ -1237,7 +1237,12 @@
       "run_id": "46012385702",
       "youtube_id": "VKHsIQFLEXI",
       "destinations": {
-        "youtube": "VKHsIQFLEXI"
+        "youtube": "VKHsIQFLEXI",
+        "facebook": {
+          "id": "3420651661438526",
+          "status": "published",
+          "url": "/reel/3420651661438526/"
+        }
       },
       "published_at": "2026-11-27T14:03:15.514068+00:00"
     }
