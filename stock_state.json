@@ -1263,7 +1263,12 @@
       "run_id": "46096134423",
       "youtube_id": "3GuwCmqPuiY",
       "destinations": {
-        "youtube": "3GuwCmqPuiY"
+        "youtube": "3GuwCmqPuiY",
+        "facebook": {
+          "id": "1710557374070502",
+          "status": "published",
+          "url": "/reel/1710557374070502/"
+        }
       },
       "published_at": "2026-11-28T02:03:25.160426+00:00"
     }
